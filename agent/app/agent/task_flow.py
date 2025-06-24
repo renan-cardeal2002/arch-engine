@@ -47,24 +47,44 @@ def _select_tool(tool_name: str):
 
 
 async def execute_task(state: TaskState, writer: StreamWriter):
-    task = state["tasks"][state["current_task_index"]]
+    try:
+        task = state["tasks"][state["current_task_index"]]
 
-    if task["tool"]:
-        tool_fn = _select_tool(task["tool"])
-        if tool_fn:
-            result = await tool_fn.run(task["args"].get("description", task["description"]))
+        if task["tool"]:
+            tool_fn = _select_tool(task["tool"])
+            if tool_fn:
+                result = await tool_fn.ainvoke(task["args"])
+            else:
+                result = f"Tool {task['tool']} not found"
         else:
-            result = f"Tool {task['tool']} not found"
+            result = await execute_description.ainvoke({"description": task["description"]})
+
+        task["status"] = "completed"
+        task["result"] = result
+        writer({"tasks": [task]})
+
+        state["messages"].append(ToolMessage(content=result, tool_call_id=str(state["current_task_index"])))
+
+    except Exception as e:
+        task = state["tasks"][state["current_task_index"]]
+        task["status"] = "error"
+        task["result"] = str(e)
+        writer({"tasks": [task]})
+        state["messages"].append(ToolMessage(content=str(e), tool_call_id=str(state["current_task_index"])))
+
+    finally:
+        state["current_task_index"] += 1
+        return {"messages": state["messages"]}
+    
+
+async def call_tool(tool, args: dict):
+    if hasattr(tool, "ainvoke"):
+        return await tool.ainvoke(args)
+    elif callable(tool):
+        return await tool(**args)
     else:
-        result = await execute_description.run(task["description"])
-
-    task["status"] = "completed"
-    task["result"] = result
-    writer({"tasks": [task]})
-
-    state["current_task_index"] += 1
-    return {"messages": [ToolMessage(content=result, tool_call_id=str(state["current_task_index"]))]}
-
+        raise ValueError("Invalid tool")
+    
 
 async def init_task_flow(tasks: List[Task]):
     builder = StateGraph(TaskState)
@@ -75,7 +95,7 @@ async def init_task_flow(tasks: List[Task]):
     builder.add_edge("execute", END)
 
     memory = MemorySaver()
-    graph = builder.compile(checkpointer=memory)
+    graph = builder.compile(checkpointer=None)
     graph.name = "TaskFlow"
 
     state = TaskState(tasks=tasks, current_task_index=0, messages=[])
