@@ -5,7 +5,9 @@ from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, MessagesState, START, END
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.types import StreamWriter, interrupt, Send
-from langchain_core.messages import ToolMessage
+from langchain_core.messages import ToolMessage, SystemMessage
+import os
+from pathlib import Path
 from langchain_core.tools import tool
 from langchain_mcp_adapters.tools import load_mcp_tools
 from langchain_mcp_adapters.client import MultiServerMCPClient
@@ -20,6 +22,14 @@ from mcp.client.stdio import stdio_client
 
 
 load_dotenv()
+
+# Load system prompt for the chatbot
+DEFAULT_PROMPT_PATH = Path(__file__).resolve().parents[2] / "instructions.txt"
+prompt_path = os.getenv("SYSTEM_PROMPT_PATH", str(DEFAULT_PROMPT_PATH))
+prompt_path = Path(prompt_path)
+if not prompt_path.is_absolute():
+    prompt_path = Path(__file__).resolve().parents[2] / prompt_path
+SYSTEM_PROMPT = prompt_path.read_text().strip() if prompt_path.exists() else None
 
 # MCP servers to connect to
 mcp_servers = {
@@ -65,6 +75,7 @@ class Weather(TypedDict):
 
 
 class State(MessagesState):
+    system_prompt: str | None
     weather_forecast: Annotated[list[Weather], operator.add]
 
 
@@ -157,7 +168,13 @@ async def chatbot(state: State):
     ] + [tool for tools_list in mcp_servers_with_tools.values() for tool in tools_list]
 
     llm = ChatOpenAI(model="gpt-4o-mini").bind_tools(tools)
-    response = await llm.ainvoke(state["messages"])
+
+    messages = list(state["messages"])
+    system_prompt = state.get("system_prompt") or SYSTEM_PROMPT
+    if system_prompt:
+        messages = [SystemMessage(content=system_prompt)] + messages
+
+    response = await llm.ainvoke(messages)
     return {"messages": [response]}
 
 

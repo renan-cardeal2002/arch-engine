@@ -2,6 +2,7 @@ import { WithMessages } from "@/hooks/useLangGraphAgent/types";
 
 // The agent state which mirrors the LangGraph state. If your sate have messages, extend WithMessages interface.
 export interface AgentState extends WithMessages {
+  system_prompt?: string;
   weather_forecast: WeatherForecast[];
 }
 

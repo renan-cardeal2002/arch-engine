@@ -99,13 +99,17 @@ async def agent(request: Request):
     if not thread_id:
         raise HTTPException(status_code=400, detail="thread_id is required")
 
+    system_prompt = body.get("system_prompt")
+
     stop_event = asyncio.Event()
     active_connections[thread_id] = stop_event
 
     config = {"configurable": {"thread_id": thread_id}}
 
     if request_type == "run":
-        input = body.get("state", None)
+        input = body.get("state", None) or {}
+        if system_prompt is not None:
+            input["system_prompt"] = system_prompt
     elif request_type == "resume":
         resume = body.get("resume")
         if not resume:
