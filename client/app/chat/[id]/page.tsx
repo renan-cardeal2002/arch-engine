@@ -4,13 +4,15 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowUp, Square, ArrowDown, Ellipsis, AlertTriangle } from "lucide-react";
+import { ArrowUp, Square, ArrowDown, Ellipsis, AlertTriangle, Cog } from "lucide-react";
 import { useLangGraphAgent } from '@/hooks/useLangGraphAgent/useLangGraphAgent';
 import { AppCheckpoint, GraphNode } from '@/hooks/useLangGraphAgent/types';
 import { AgentState, InterruptValue, ResumeValue } from './agent-types';
 import { CheckpointCard } from './components/checkpoint-card';
 import { ChatbotNode } from './components/chatbot-node';
 import { Checkbox } from "@/components/ui/checkbox";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useChatStore } from "@/stores/chat-store";
 import WeatherNode from './components/weather/weather-node';
 import Reminder from './components/reminder';
 import { NodeCard } from './components/node-card';
@@ -20,12 +22,21 @@ export default function ChatPage() {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  const { chats, updateSystemPrompt } = useChatStore();
+
+  const chatItem = chats.find(c => c.id === params.id);
+  const [systemPrompt, setSystemPrompt] = useState(chatItem?.systemPrompt || '');
+
   const [threadId] = useState(params.id);
   const [inputValue, setInputValue] = useState('');
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
   const [showNodesinfo, setShowNodesinfo] = useState(false);
   const [restoreError, setRestoreError] = useState(false);
+
+  useEffect(() => {
+    setSystemPrompt(chatItem?.systemPrompt || '');
+  }, [chatItem?.systemPrompt]);
 
   const exampleMessages = [
     "What's the weather in SF today?",
@@ -112,7 +123,7 @@ export default function ChatPage() {
   const handleExampleClick = (message: string) => {
     if (status !== 'running' && !restoring) {
       setRestoreError(false);
-      run({ thread_id: threadId, state: { "messages": [{ type: 'user', content: message }] } });
+      run({ thread_id: threadId, state: { system_prompt: systemPrompt, "messages": [{ type: 'user', content: message }] } });
     }
   };
 
@@ -158,6 +169,24 @@ export default function ChatPage() {
           >
             Show graph info
           </label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button size="icon" variant="outline">
+                <Cog className="h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 space-y-2">
+              <Textarea
+                value={systemPrompt}
+                onChange={(e) => setSystemPrompt(e.target.value)}
+                placeholder="System prompt..."
+                className="font-mono"
+              />
+              <Button size="sm" onClick={() => updateSystemPrompt(threadId, systemPrompt)}>
+                Save
+              </Button>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
@@ -243,7 +272,7 @@ export default function ChatPage() {
                   e.preventDefault();
                   if (inputValue.trim() && status !== 'running' && !restoring) {
                     setRestoreError(false);
-                    run({ thread_id: threadId, state: { "messages": [{ type: 'user', content: inputValue }] } });
+                    run({ thread_id: threadId, state: { system_prompt: systemPrompt, "messages": [{ type: 'user', content: inputValue }] } });
                     setInputValue('');
                   }
                 }
@@ -266,7 +295,7 @@ export default function ChatPage() {
                 disabled={!inputValue.trim() || restoring}
                 onClick={() => {
                   if (inputValue.trim() && !restoring) {
-                    run({ thread_id: threadId, state: { "messages": [{ type: 'user', content: inputValue }] } });
+                    run({ thread_id: threadId, state: { system_prompt: systemPrompt, "messages": [{ type: 'user', content: inputValue }] } });
                     setInputValue('');
                   }
                 }}
