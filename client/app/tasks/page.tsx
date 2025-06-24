@@ -74,16 +74,19 @@ export default function TasksPage() {
     <div className="max-w-2xl mx-auto p-4 space-y-4">
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={tasks} strategy={verticalListSortingStrategy}>
-          {tasks.map((task) => (
-            <TaskCard
-              key={task.id}
-              id={task.id}
-              description={task.description}
-              status={task.status}
-              result={task.result}
-              onChange={(v) => updateTask(task.id, v)}
-            />
-          ))}
+          <ol className="space-y-4">
+            {tasks.map((task, idx) => (
+              <TaskCard
+                key={task.id}
+                id={task.id}
+                description={task.description}
+                status={task.status}
+                result={task.result}
+                onChange={(v) => updateTask(task.id, v)}
+                isLast={idx === tasks.length - 1}
+              />
+            ))}
+          </ol>
         </SortableContext>
       </DndContext>
       <Button variant="secondary" onClick={addTask} className="mt-2">
