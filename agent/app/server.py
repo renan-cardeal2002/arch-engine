@@ -209,7 +209,7 @@ async def run_tasks(request: Request):
     if not tasks:
         raise HTTPException(status_code=404, detail="no tasks for thread_id")
 
-    graph_task, state = await init_task_flow(tasks)
+    graph_task, state = await init_task_flow(tasks, use_mcp=use_mcp)
     await graph_task.ainvoke(state, config=None)
     return {"tasks": tasks}
 
