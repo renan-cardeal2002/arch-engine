@@ -73,6 +73,9 @@ poetry install
 poetry run server --mcp
 ```
 
+### WhatsApp (Twilio) integration
+The agent server includes an endpoint for Twilio webhooks so you can chat with the agent via WhatsApp. Configure your Twilio account to send webhook requests to `/twilio/whatsapp` and add the required Twilio environment variables in `agent/.env` (see `.env.example`).
+
 ## Next.js client
 ```bash
 cd client/

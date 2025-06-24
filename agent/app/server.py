@@ -1,6 +1,9 @@
 import uvicorn
 from langgraph.types import Command, Interrupt
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Form
+from fastapi.responses import Response
+from twilio.twiml.messaging_response import MessagingResponse
+from langchain_core.messages import HumanMessage
 from fastapi.middleware.cors import CORSMiddleware
 from sse_starlette.sse import EventSourceResponse
 from typing import AsyncGenerator, Dict
@@ -168,6 +171,29 @@ async def agent(request: Request):
                 del active_connections[thread_id]
 
     return EventSourceResponse(generate_events())
+
+
+@app.post("/twilio/whatsapp")
+async def twilio_whatsapp(from_: str = Form(..., alias="From"), body: str = Form(..., alias="Body")):
+    """Handle incoming WhatsApp messages from Twilio."""
+    thread_id = from_
+    input_state = {
+        "messages": [HumanMessage(content=body)]
+    }
+    config = {"configurable": {"thread_id": thread_id}}
+
+    response_text = ""
+    async for chunk in graph.astream(input_state, config, stream_mode=["messages"]):
+        chunk_type, chunk_data = chunk
+        if chunk_type == "messages":
+            msg = chunk_data[0]
+            content = getattr(msg, "content", None)
+            if content:
+                response_text += content
+
+    twiml = MessagingResponse()
+    twiml.message(response_text)
+    return Response(content=str(twiml), media_type="application/xml")
 
 
 def main():
