@@ -13,9 +13,11 @@ import asyncio
 import argparse
 
 from app.agent.graph import init_agent
+from app.agent.task_flow import init_task_flow, Task
 
 # Track active connections
 active_connections: Dict[str, asyncio.Event] = {}
+task_storage: Dict[str, list[Task]] = {}
 
 graph = None
 use_mcp = False
@@ -171,6 +173,45 @@ async def agent(request: Request):
                 del active_connections[thread_id]
 
     return EventSourceResponse(generate_events())
+
+
+@app.post("/tasks/create")
+async def create_tasks(request: Request):
+    body = await request.json()
+    thread_id = body.get("thread_id")
+    if not thread_id:
+        raise HTTPException(status_code=400, detail="thread_id is required")
+
+    tasks_input = body.get("tasks", [])
+    tasks: list[Task] = []
+    for t in tasks_input:
+        tasks.append(
+            {
+                "description": t.get("description", ""),
+                "tool": t.get("tool"),
+                "args": t.get("args", {}),
+                "status": "pending",
+                "result": None,
+            }
+        )
+    task_storage[thread_id] = tasks
+    return {"status": "created", "count": len(tasks)}
+
+
+@app.post("/tasks/run")
+async def run_tasks(request: Request):
+    body = await request.json()
+    thread_id = body.get("thread_id")
+    if not thread_id:
+        raise HTTPException(status_code=400, detail="thread_id is required")
+
+    tasks = task_storage.get(thread_id)
+    if not tasks:
+        raise HTTPException(status_code=404, detail="no tasks for thread_id")
+
+    graph_task, state = await init_task_flow(tasks)
+    await graph_task.ainvoke(state)
+    return {"tasks": tasks}
 
 
 @app.post("/twilio/whatsapp")
