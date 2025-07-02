@@ -1,10 +1,23 @@
 'use client'
 
-export default function ConsolePage() {
+import { ThemeProvider } from "@/components/theme-provider";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebarConsole } from "@/components/app-sidebar-console"
+
+export default function ConsolePage({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Console</h1>
-      <p className="text-muted-foreground">Interface para gestão e cadastros.</p>
-    </div>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      <SidebarProvider>
+        <AppSidebarConsole />
+        <div className="relative min-h-screen w-full">
+          <SidebarTrigger className="absolute left-1 top-1 z-50" />
+          <main className="h-full">{children}</main>
+        </div>
+      </SidebarProvider>
+    </ThemeProvider>
   );
 }

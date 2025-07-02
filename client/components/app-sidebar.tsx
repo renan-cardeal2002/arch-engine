@@ -14,7 +14,7 @@ import {
   SidebarGroupLabel,
   SidebarGroupAction
 } from "@/components/ui/sidebar"
-import { Bot, Plus, MessageSquare } from "lucide-react"
+import { Bot, Plus, MessageSquare, Terminal, Cog } from "lucide-react"
 import { useChatStore } from "@/stores/chat-store"
 import ThemeSwitcher from "./theme-switcher"
 
@@ -75,18 +75,20 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
+        <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="/console">
+                  <Terminal />
+                  <span>Console</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+      </SidebarFooter>
+      <SidebarFooter>
         <div className="flex flex-col items-center text-sm gap-4">
           <ThemeSwitcher />
-          <span>Made by{" "}
-            <a
-              href="https://geckossoftware.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:text-primary/80 transition-colors inline-flex items-center gap-1 font-semibold underline underline-offset-4"
-            >
-              Geckos Software
-            </a>
-          </span>
         </div>
       </SidebarFooter>
     </Sidebar>
