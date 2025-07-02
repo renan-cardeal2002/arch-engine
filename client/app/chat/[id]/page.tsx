@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowUp, Square, ArrowDown, Ellipsis, AlertTriangle, Cog } from "lucide-react";
@@ -158,6 +159,9 @@ export default function ChatPage() {
     <div className="flex flex-col h-screen">
       <div className="flex justify-end flex-shrink-0 p-2">
         <div className="flex items-center space-x-2">
+          <Button asChild size="sm" variant="outline">
+            <Link href="/console">Console</Link>
+          </Button>
           <Checkbox
             id="show-nodesinfo"
             checked={showNodesinfo}
