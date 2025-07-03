@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
+import { BreadcrumbProvider } from "@/components/breadcrumb-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Geckos AI",
+  title: "Console",
   description: "",
 };
 
@@ -34,13 +35,15 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SidebarProvider>
-            <AppSidebar />
-            <div className="relative min-h-screen w-full">
-              <SidebarTrigger className="absolute left-1 top-1 z-50" />
-              <main className="h-full">{children}</main>
-            </div>
-          </SidebarProvider>
+          <BreadcrumbProvider>
+            <SidebarProvider>
+              <AppSidebar />
+              <div className="relative min-h-screen w-full">
+                <SidebarTrigger className="absolute left-1 top-1 z-50" />
+                <main className="h-full">{children}</main>
+              </div>
+            </SidebarProvider>
+          </BreadcrumbProvider>
         </ThemeProvider>
       </body>
     </html>

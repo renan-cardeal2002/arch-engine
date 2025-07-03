@@ -15,18 +15,11 @@ import {
   SidebarGroupAction
 } from "@/components/ui/sidebar"
 import { Bot, House, ListChecks, MessageCircle, Server, MessageCircleCode, BookText, Hammer, Mic, SquareKanban, Timer } from "lucide-react"
-import { useChatStore } from "@/stores/chat-store"
 import ThemeSwitcher from "./theme-switcher"
 
-export function AppSidebarConsole() {
+export function AppSidebar() {
   const pathname = usePathname()
   const router = useRouter()
-  const { chats, addChat } = useChatStore()
-
-  const handleAddChat = () => {
-    const newChat = addChat()
-    router.push(`/chat/${newChat.id}`)
-  }
 
   return (
     <Sidebar>
@@ -49,8 +42,8 @@ export function AppSidebarConsole() {
           {/* <SidebarGroupLabel>Principal</SidebarGroupLabel> */}
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname === '/home'}>
-                <Link href="/home">
+              <SidebarMenuButton asChild isActive={pathname === '/'}>
+                <Link href="/">
                   <House />
                   Início
                 </Link>
@@ -61,8 +54,8 @@ export function AppSidebarConsole() {
           <SidebarMenu>
             <SidebarGroupLabel>Serviços</SidebarGroupLabel>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname === '/services'}>
-                <Link href="/services">
+              <SidebarMenuButton asChild isActive={pathname === '/chats'}>
+                <Link href="/chats">
                   <MessageCircleCode />
                   Chats
                 </Link>
@@ -125,13 +118,17 @@ export function AppSidebarConsole() {
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname === '/schedule'}>
-                <Link href="/schedule">
+              <SidebarMenuButton asChild isActive={pathname === '/schedules'}>
+                <Link href="/schedules">
                   <Timer />
                   Agendamentos
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
+          </SidebarMenu>
+
+          <SidebarMenu>
+            <SidebarGroupLabel>Playground</SidebarGroupLabel>
           </SidebarMenu>
 
           <SidebarMenu>
@@ -144,7 +141,7 @@ export function AppSidebarConsole() {
         <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <Link href="/">
+                <Link href="http://localhost:3000" target="_blank" rel="noopener noreferrer">
                   <MessageCircle />
                   <span>Chat</span>
                 </Link>

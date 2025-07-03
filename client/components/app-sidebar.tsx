@@ -78,7 +78,7 @@ export function AppSidebar() {
         <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <Link href="/console">
+                <Link href="http://localhost:3333" target="_blank" rel="noopener noreferrer">
                   <Terminal />
                   <span>Console</span>
                 </Link>
