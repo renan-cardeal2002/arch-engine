@@ -11,7 +11,7 @@ export default function TasksPage() {
    useEffect(() => {
     setItems([
       { label: "Home", href: "/" },
-      { label: "Tasks" },
+      { label: "Tarefas" },
     ]);
   }, [setItems]);
   
@@ -33,7 +33,7 @@ export default function TasksPage() {
           transition
           dark:bg-neutral-200 dark:text-black dark:hover:bg-neutral-300
         ">
-          + Incluir
+          + Nova tarefa
         </button>
       </div>
       

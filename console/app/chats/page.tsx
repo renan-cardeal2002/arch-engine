@@ -33,7 +33,7 @@ export default function ChatsPage() {
           transition
           dark:bg-neutral-200 dark:text-black dark:hover:bg-neutral-300
         ">
-          + Incluir
+          + Novo Chat
         </button>
       </div>
       

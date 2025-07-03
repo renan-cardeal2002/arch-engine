@@ -34,7 +34,7 @@ export default function AgentsPage() {
           transition
           dark:bg-neutral-200 dark:text-black dark:hover:bg-neutral-300
         ">
-          + Incluir
+          + Novo agente
         </button>
       </div>
       

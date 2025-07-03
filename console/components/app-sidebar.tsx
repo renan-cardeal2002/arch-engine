@@ -101,7 +101,7 @@ export function AppSidebar() {
               <SidebarMenuButton asChild isActive={pathname === '/knowledges'}>
                 <Link href="/knowledges">
                   <BookText />
-                  Conhecimento
+                  Conhecimentos
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
