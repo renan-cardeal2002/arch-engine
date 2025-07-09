@@ -1,12 +1,12 @@
 import { GraphNode } from "@/hooks/useLangGraphAgent/types";
-import { AgentState } from "../agent-types";
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { JsonView, defaultStyles } from 'react-json-view-lite';
+} from "@/components/ui/popover";
+import { JsonView, defaultStyles } from "react-json-view-lite";
+import { AgentState } from "../agent-types";
 
 export function NodeCard({ node }: { node: GraphNode<AgentState> }) {
   return (
