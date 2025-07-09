@@ -17,12 +17,12 @@ export default function AgentsPage() {
     {
       id: 1,
       name: "Analista de Orçamentos",
-      description: "Especialista em gerar orçamentos personalizados.",
+      description: "Agente especializado em gerar orçamentos",
     },
     {
       id: 2,
       name: "Vendedor Online",
-      description: "Especialista em realizar atendimentos de leads.",
+      description: "Agente especializado em realizar atendimentos de leads",
     },
   ];
 

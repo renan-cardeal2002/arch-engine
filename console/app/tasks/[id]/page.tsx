@@ -5,6 +5,7 @@ import { useBreadcrumb } from "@/components/breadcrumb-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { AlignLeft, Barcode, Box } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -68,6 +69,9 @@ export default function TaskPage() {
             <div className="flex gap-6 flex-wrap">
               <div>
                 <div className="text-xs font-bold flex items-center gap-1 text-neutral-600 dark:text-neutral-300">
+                  <span className="inline-block">
+                    <Box />
+                  </span>
                   Nome
                 </div>
                 <div className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
@@ -76,6 +80,9 @@ export default function TaskPage() {
               </div>
               <div>
                 <div className="text-xs font-bold flex items-center gap-1 text-neutral-600 dark:text-neutral-300">
+                  <span className="inline-block">
+                    <Barcode />
+                  </span>
                   Código de identificação
                 </div>
                 <div className="text-lg font-mono opacity-80 text-neutral-800 dark:text-neutral-300">
@@ -85,6 +92,9 @@ export default function TaskPage() {
             </div>
             <div className="mt-4">
               <div className="text-xs font-bold flex items-center gap-1 text-neutral-600 dark:text-neutral-300">
+                <span className="inline-block">
+                  <AlignLeft />
+                </span>
                 Descrição
               </div>
               <div className="text-base text-neutral-900 dark:text-neutral-100">
@@ -130,7 +140,6 @@ export default function TaskPage() {
         </div>
       </div>
 
-      {/* CARD ESPECIALISTAS */}
       <div
         className="
             bg-white dark:bg-neutral-900
@@ -140,7 +149,7 @@ export default function TaskPage() {
       >
         <div className="flex items-center justify-between mb-4">
           <div className="font-semibold text-lg flex items-center gap-2 text-neutral-900 dark:text-neutral-100">
-            <span>▾</span> Especialistas Digitais
+            <span>▾</span> Agentes
           </div>
           <Button
             className="
@@ -148,11 +157,11 @@ export default function TaskPage() {
                     dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800
                 "
           >
-            Novo especialista digital
+            + Novo agente
           </Button>
         </div>
         <Input
-          placeholder="Buscar um especialista"
+          placeholder="Buscar um agente..."
           className="
                 mb-4
                 bg-white dark:bg-neutral-900
@@ -172,7 +181,7 @@ export default function TaskPage() {
           <tbody>
             <tr>
               <td colSpan={3} className="text-center opacity-80">
-                Nenhum especialista vinculado a essa tarefa
+                Nenhum agente vinculado a essa tarefa
               </td>
             </tr>
           </tbody>
