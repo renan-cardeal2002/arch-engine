@@ -1,23 +1,48 @@
-'use client';
+"use client";
 
 import AppBreadcrumb from "@/components/app-breadcrumb";
 import { useBreadcrumb } from "@/components/breadcrumb-provider";
+import { Button } from "@/components/ui/button";
 import { Edit, Trash2, Eye, Cog } from "lucide-react";
-import { useEffect } from "react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import ConfigModal from "./components/config-modal";
+import { TaskConfig, TaskItem } from "./components/types";
 
 export default function TasksPage() {
   const { setItems } = useBreadcrumb();
+  const [configModalOpen, setConfigModalOpen] = useState(false);
+  const [configModalItem, setConfigModalItem] = useState<TaskItem | null>(null);
 
-   useEffect(() => {
-    setItems([
-      { label: "Home", href: "/" },
-      { label: "Tarefas" },
-    ]);
+  useEffect(() => {
+    setItems([{ label: "Home", href: "/" }, { label: "Tarefas" }]);
   }, [setItems]);
-  
-  const dados = [
-    { id: 1, name: "Gerador de orçamentos", description: "Automação que executa a manipulação de orçamentos e cria orçamentos personalizados." },
-  ];
+
+  const [dados, setDados] = useState<TaskItem[]>([
+    {
+      id: 1,
+      name: "Gerador de orçamentos",
+      description:
+        "Automação que executa a manipulação de orçamentos e cria orçamentos personalizados",
+    },
+  ]);
+
+  function handleConfig(item: TaskItem) {
+    setConfigModalItem(item);
+    setConfigModalOpen(true);
+  }
+
+  function handleConfigSave(config: TaskConfig) {
+    if (configModalItem) {
+      setDados((dados) =>
+        dados.map((item) =>
+          item.id === configModalItem.id ? { ...item, config } : item
+        )
+      );
+      setConfigModalOpen(false);
+      setConfigModalItem(null);
+    }
+  }
 
   return (
     <div className="overflow-x-auto border-b border-t mt-10">
@@ -26,17 +51,23 @@ export default function TasksPage() {
       </div>
 
       <div className="flex justify-end pe-8">
-        <button className="
-          px-4 py-2 rounded-lg shadow
-          bg-neutral-800 text-white
-          hover:bg-neutral-700
-          transition
-          dark:bg-neutral-200 dark:text-black dark:hover:bg-neutral-300
-        ">
+        <Button
+          className="
+          bg-green-100 text-green-700 hover:bg-green-200
+          dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800
+        "
+        >
           + Nova tarefa
-        </button>
+        </Button>
       </div>
-      
+
+      <ConfigModal
+        open={configModalOpen}
+        onClose={() => setConfigModalOpen(false)}
+        config={configModalItem?.config}
+        onSave={handleConfigSave}
+      />
+
       <table className="min-w-full">
         <thead>
           <tr>
@@ -51,18 +82,24 @@ export default function TasksPage() {
               <td className="px-4 py-2">{item.name}</td>
               <td className="px-4 py-2">{item.description}</td>
               <td className="px-4 py-2 flex gap-2">
-                <button className="hover:text-blue-600" title="Visualizar">
-                  <Eye size={21} />
-                </button>
-                <button className="hover:text-green-600" title="Editar">
+                <Link href={`/tasks/${item.id}`}>
+                  <Button className="hover:bg-blue-600" title="Visualizar">
+                    <Eye size={21} />
+                  </Button>
+                </Link>
+                <Button className="hover:bg-green-600" title="Editar">
                   <Edit size={21} />
-                </button>
-                <button className="hover:text-grey-600" title="Configurações">
+                </Button>
+                <Button
+                  className="hover:bg-sky-600"
+                  title="Configurações"
+                  onClick={() => handleConfig(item)}
+                >
                   <Cog size={21} />
-                </button>
-                <button className="hover:text-red-600" title="Deletar">
+                </Button>
+                <Button className="hover:bg-red-600" title="Deletar">
                   <Trash2 size={21} />
-                </button>
+                </Button>
               </td>
             </tr>
           ))}
