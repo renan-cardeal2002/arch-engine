@@ -68,6 +68,16 @@ mcp_servers_with_tools = {}
 tool_to_server_lookup = {}
 
 
+class AgentStateCtx(TypedDict):
+    flow_data: str | None
+    service_id: int | str | None
+
+
+class Context(TypedDict):
+    agent_state: AgentStateCtx
+    settings: dict[str, Any]
+
+
 class Weather(TypedDict):
     location: str
     search_status: str
@@ -77,6 +87,7 @@ class Weather(TypedDict):
 class State(MessagesState):
     system_prompt: str | None
     weather_forecast: Annotated[list[Weather], operator.add]
+    context: Context
 
 
 class WeatherInput(TypedDict):
@@ -111,6 +122,7 @@ async def create_reminder_tool(reminder_text: str) -> str:
 
 async def weather(input: WeatherInput, writer: StreamWriter):
     location = input["args"]["query"]
+    context = input["args"].get("context", {})
 
     # Send custom event to the client. It will update the state of the last checkpoint and all child nodes.
     # Note: if there are multiple child nodes (e.g. parallel nodes), the state will be updated for all of them.
@@ -124,6 +136,7 @@ async def weather(input: WeatherInput, writer: StreamWriter):
 
 
 async def reminder(input: ToolNodeArgs):
+    context = input['args'].get('context', {})
     res = interrupt(input['args']['reminder_text'])
 
     tool_answer = "Reminder created." if res == 'approve' else "Reminder creation cancelled by user."
@@ -132,6 +145,7 @@ async def reminder(input: ToolNodeArgs):
 
 
 async def mcp_tool(input: McpToolNodeArgs):
+    context = input["args"].get("context", {})
     if input["server_name"] not in mcp_servers:
         raise ValueError(
             f"Server with name {input['server_name']} not found in MCP servers list")
@@ -186,15 +200,17 @@ def assign_tool(state: State) -> Literal["weather", "reminder", "mcp_tool", "__e
         send_list = []
         for tool in last_message.tool_calls:
             if tool["name"] == 'weather_tool':
+                tool["args"]["context"] = state.get("context", {})
                 send_list.append(Send('weather', tool))
             elif tool["name"] == 'create_reminder_tool':
+                tool["args"]["context"] = state.get("context", {})
                 send_list.append(Send('reminder', tool))
             elif any(tool["name"] == mcp_tool.name for mcp_tool in [tool for tools_list in mcp_servers_with_tools.values() for tool in tools_list]):
                 server_name = tool_to_server_lookup.get(tool["name"], None)
                 args = McpToolNodeArgs(
                     server_name=server_name,
                     name=tool["name"],
-                    args=tool["args"],
+                    args={**tool["args"], "context": state.get("context", {})},
                     id=tool["id"]
                 )
                 send_list.append(Send('mcp_tool', args))

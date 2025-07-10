@@ -109,6 +109,10 @@ export interface AgentEvent<TAgentState, TInterruptValue> {
 /** Generic interface for an agent input. Thread id is required. */
 interface AgentInput {
   thread_id: string;
+  service_id?: number | string;
+  flow_data?: string;
+  tool_name?: string;
+  settings?: Record<string, string>;
 }
 
 export interface RunAgentInput<TAgentState> extends AgentInput {
