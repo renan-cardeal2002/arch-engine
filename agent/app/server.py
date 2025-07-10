@@ -12,7 +12,7 @@ from contextlib import asynccontextmanager
 import asyncio
 import argparse
 
-from app.agent.graph import init_agent
+from app.main import init_agent
 from app.agent.task_flow import init_task_flow, Task
 from app.settings import ConfigField, get_service_settings, save_service_settings
 

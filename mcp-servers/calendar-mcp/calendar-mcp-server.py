@@ -11,14 +11,16 @@ mcp = FastMCP("Calendar MCP Server", port=3002)
 
 
 @mcp.tool()
-def create_event(name: str, date: str) -> str:
+def create_event(name: str, date: str, context) -> str:
     """Create an event"""
+    print(f"Esse é o contexto: {context}")
     return f"Event {name} created at {date}"
 
 
 @mcp.tool()
-def list_events() -> str:
+def list_events(context) -> str:
     """List all events"""
+    print(f"Esse é o contexto: {context}")
     return json.dumps([
         {"name": "Do groceries", "date": "2025-04-12"},
         {"name": "Pay bills", "date": "2025-04-13"},
@@ -29,3 +31,4 @@ def list_events() -> str:
 if __name__ == "__main__":
     print(f"Starting Calendar MCP server with transport: {args.transport}")
     mcp.run(transport=args.transport)
+    print("Calendar MCP server is running.")
