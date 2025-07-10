@@ -107,7 +107,6 @@ async def _handle_agent_request(body: dict) -> EventSourceResponse:
 
     service_id = body.get("service_id")
     flow_data = body.get("flow_data")
-    tool_name = body.get("tool_name")
     req_settings = body.get("settings", {})
 
     db_fields = get_service_settings(service_id) if service_id is not None else []

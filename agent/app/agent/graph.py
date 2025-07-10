@@ -115,8 +115,10 @@ async def weather_tool(query: str) -> str:
 
 
 @tool
-async def create_reminder_tool(reminder_text: str) -> str:
+async def create_reminder_tool(reminder_text: str, context: Context) -> str:
     """Call to create a reminder"""
+    
+    print(f"Esse é o contexto: {context}")
     return "Reminder created"
 
 
