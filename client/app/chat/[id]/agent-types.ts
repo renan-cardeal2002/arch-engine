@@ -4,6 +4,10 @@ import { WithMessages } from "@/hooks/useLangGraphAgent/types";
 export interface AgentState extends WithMessages {
   system_prompt?: string;
   weather_forecast: WeatherForecast[];
+  context?: {
+    agent_state: { flow_data?: string | null; service_id?: number | string | null };
+    settings: Record<string, any>;
+  };
 }
 
 export interface WeatherForecast {

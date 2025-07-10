@@ -14,7 +14,7 @@ import argparse
 
 from app.agent.graph import init_agent
 from app.agent.task_flow import init_task_flow, Task
-from app.settings import ConfigField, get_tool_settings, save_tool_settings
+from app.settings import ConfigField, get_service_settings, save_service_settings
 
 # Track active connections
 active_connections: Dict[str, asyncio.Event] = {}
@@ -92,10 +92,8 @@ async def stop_agent(request: Request):
     raise HTTPException(status_code=404, detail="Thread is not running")
 
 
-@app.post("/agent")
-async def agent(request: Request):
-    """Endpoint for running the agent."""
-    body = await request.json()
+async def _handle_agent_request(body: dict) -> EventSourceResponse:
+    """Internal helper to run the agent from a request body."""
 
     request_type = body.get("type")
     if not request_type:
@@ -112,7 +110,7 @@ async def agent(request: Request):
     tool_name = body.get("tool_name")
     req_settings = body.get("settings", {})
 
-    db_fields = get_tool_settings(tool_name) if tool_name else []
+    db_fields = get_service_settings(service_id) if service_id is not None else []
     settings_dict = {f["key"]: f["value"] for f in db_fields}
     if isinstance(req_settings, dict):
         settings_dict.update(req_settings)
@@ -191,24 +189,40 @@ async def agent(request: Request):
             if thread_id in active_connections:
                 del active_connections[thread_id]
 
+
     return EventSourceResponse(generate_events())
 
 
-@app.get("/settings/{tool_name}")
-async def get_settings_endpoint(tool_name: str):
-    """Return stored settings for a tool."""
-    fields = get_tool_settings(tool_name)
+@app.post("/agent")
+async def agent(request: Request):
+    """Endpoint for running the agent."""
+    body = await request.json()
+    return await _handle_agent_request(body)
+
+
+@app.post("/service-agent/{service_id}")
+async def service_agent(service_id: str, request: Request):
+    """Run the agent for a specific service with defaults."""
+    body = await request.json()
+    body["service_id"] = service_id
+    return await _handle_agent_request(body)
+
+
+@app.get("/service-settings/{service_id}")
+async def get_service_settings_endpoint(service_id: str):
+    """Return stored settings for a service."""
+    fields = get_service_settings(service_id)
     return {"fields": fields}
 
 
-@app.post("/settings/{tool_name}")
-async def save_settings_endpoint(tool_name: str, request: Request):
-    """Save settings for a tool."""
+@app.post("/service-settings/{service_id}")
+async def save_service_settings_endpoint(service_id: str, request: Request):
+    """Save settings for a service."""
     body = await request.json()
     fields = body.get("fields", [])
     if not isinstance(fields, list):
         raise HTTPException(status_code=400, detail="fields must be a list")
-    save_tool_settings(tool_name, fields)
+    save_service_settings(service_id, fields)
     return {"status": "saved", "count": len(fields)}
 
 
