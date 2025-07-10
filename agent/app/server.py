@@ -6,7 +6,7 @@ from twilio.twiml.messaging_response import MessagingResponse
 from langchain_core.messages import HumanMessage
 from fastapi.middleware.cors import CORSMiddleware
 from sse_starlette.sse import EventSourceResponse
-from typing import AsyncGenerator, Dict
+from typing import AsyncGenerator, Dict, List
 from app.utils import message_chunk_event, interrupt_event, custom_event, checkpoint_event, format_state_snapshot
 from contextlib import asynccontextmanager
 import asyncio
@@ -14,6 +14,7 @@ import argparse
 
 from app.agent.graph import init_agent
 from app.agent.task_flow import init_task_flow, Task
+from app.settings import ConfigField, get_tool_settings, save_tool_settings
 
 # Track active connections
 active_connections: Dict[str, asyncio.Event] = {}
@@ -106,6 +107,21 @@ async def agent(request: Request):
 
     system_prompt = body.get("system_prompt")
 
+    service_id = body.get("service_id")
+    flow_data = body.get("flow_data")
+    tool_name = body.get("tool_name")
+    req_settings = body.get("settings", {})
+
+    db_fields = get_tool_settings(tool_name) if tool_name else []
+    settings_dict = {f["key"]: f["value"] for f in db_fields}
+    if isinstance(req_settings, dict):
+        settings_dict.update(req_settings)
+
+    context = {
+        "agent_state": {"flow_data": flow_data, "service_id": service_id},
+        "settings": settings_dict,
+    }
+
     stop_event = asyncio.Event()
     active_connections[thread_id] = stop_event
 
@@ -136,6 +152,9 @@ async def agent(request: Request):
         input = None
     else:
         raise HTTPException(status_code=400, detail="invalid request type")
+
+    if isinstance(input, dict):
+        input["context"] = context
 
     print("request_type:", request_type)
     print("thread_id:", thread_id)
@@ -173,6 +192,24 @@ async def agent(request: Request):
                 del active_connections[thread_id]
 
     return EventSourceResponse(generate_events())
+
+
+@app.get("/settings/{tool_name}")
+async def get_settings_endpoint(tool_name: str):
+    """Return stored settings for a tool."""
+    fields = get_tool_settings(tool_name)
+    return {"fields": fields}
+
+
+@app.post("/settings/{tool_name}")
+async def save_settings_endpoint(tool_name: str, request: Request):
+    """Save settings for a tool."""
+    body = await request.json()
+    fields = body.get("fields", [])
+    if not isinstance(fields, list):
+        raise HTTPException(status_code=400, detail="fields must be a list")
+    save_tool_settings(tool_name, fields)
+    return {"status": "saved", "count": len(fields)}
 
 
 @app.post("/tasks/create")
