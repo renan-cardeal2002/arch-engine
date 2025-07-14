@@ -61,7 +61,7 @@ export default function ChatPlaygroundPage() {
   const [serviceId, setServiceId] = useState("");
   const [flowData, setFlowData] = useState("");
   const [toolName, setToolName] = useState("");
-  const [settingsJson, setSettingsJson] = useState("{}");
+  const [settingsJson, setSettingsJson] = useState("");
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
   const [showNodesinfo, setShowNodesinfo] = useState(false);
@@ -257,40 +257,30 @@ export default function ChatPlaygroundPage() {
             </div>
             <div className="mb-4">
               <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1">
-                Service ID
-              </label>
-              <Input
-                className="w-full bg-neutral-200 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 text-neutral-800 dark:text-neutral-100 placeholder:text-neutral-500 rounded px-3 py-2"
-                placeholder="Service ID"
-                value={serviceId}
-                onChange={(e) => setServiceId(e.target.value)}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1">
                 Flow Data
               </label>
-              <Input
-                className="w-full bg-neutral-200 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 text-neutral-800 dark:text-neutral-100 placeholder:text-neutral-500 rounded px-3 py-2"
-                placeholder="Flow Data"
+              <Textarea
+                className="font-mono bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 border border-neutral-300 dark:border-neutral-800 rounded"
+                rows={3}
+                placeholder='{"key": "value"}'
                 value={flowData}
                 onChange={(e) => setFlowData(e.target.value)}
               />
             </div>
             <div className="mb-4">
               <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1">
-                Tool Name
+                Ferramentas
               </label>
               <Input
                 className="w-full bg-neutral-200 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 text-neutral-800 dark:text-neutral-100 placeholder:text-neutral-500 rounded px-3 py-2"
-                placeholder="Tool name"
+                placeholder="Nome da ferramenta"
                 value={toolName}
                 onChange={(e) => setToolName(e.target.value)}
               />
             </div>
             <div className="mb-4">
               <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1">
-                Settings (JSON)
+                Configurações
               </label>
               <Textarea
                 className="font-mono bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 border border-neutral-300 dark:border-neutral-800 rounded"
@@ -428,14 +418,15 @@ export default function ChatPlaygroundPage() {
                           service_id: serviceId || undefined,
                           flow_data: flowData || undefined,
                           tool_name: toolName || undefined,
-                          settings:
-                            (() => {
-                              try {
-                                return settingsJson.trim() !== "" ? JSON.parse(settingsJson) : undefined;
-                              } catch {
-                                return undefined;
-                              }
-                            })(),
+                          settings: (() => {
+                            try {
+                              return settingsJson.trim() !== ""
+                                ? JSON.parse(settingsJson)
+                                : undefined;
+                            } catch {
+                              return undefined;
+                            }
+                          })(),
                           state: {
                             system_prompt: systemPrompt,
                             messages: [{ type: "user", content: inputValue }],
@@ -468,14 +459,15 @@ export default function ChatPlaygroundPage() {
                           service_id: serviceId || undefined,
                           flow_data: flowData || undefined,
                           tool_name: toolName || undefined,
-                          settings:
-                            (() => {
-                              try {
-                                return settingsJson.trim() !== "" ? JSON.parse(settingsJson) : undefined;
-                              } catch {
-                                return undefined;
-                              }
-                            })(),
+                          settings: (() => {
+                            try {
+                              return settingsJson.trim() !== ""
+                                ? JSON.parse(settingsJson)
+                                : undefined;
+                            } catch {
+                              return undefined;
+                            }
+                          })(),
                           state: {
                             system_prompt: systemPrompt,
                             messages: [{ type: "user", content: inputValue }],
