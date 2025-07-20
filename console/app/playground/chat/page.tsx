@@ -6,6 +6,7 @@ import {
   AlertTriangle,
   ArrowDown,
   Ellipsis,
+  Save,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -325,6 +326,7 @@ export default function ChatPlaygroundPage() {
                 className="bg-green-100 text-green-700 hover:bg-green-200
                        dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800"
               >
+                <Save />
                 Salvar Chat
               </Button>
             </div>

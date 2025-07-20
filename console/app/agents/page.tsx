@@ -3,7 +3,7 @@
 import AppBreadcrumb from "@/components/app-breadcrumb";
 import { useBreadcrumb } from "@/components/breadcrumb-provider";
 import { Button } from "@/components/ui/button";
-import { Edit, Eye, Trash2 } from "lucide-react";
+import { Edit, Eye, Plus, Trash2 } from "lucide-react";
 import { useEffect } from "react";
 
 export default function AgentsPage() {
@@ -39,7 +39,8 @@ export default function AgentsPage() {
           dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800
         "
         >
-          + Novo agente
+          <Plus />
+          Novo agente
         </Button>
       </div>
 

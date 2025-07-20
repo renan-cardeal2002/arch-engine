@@ -1,8 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { ArrowDown } from "lucide-react";
+import { ArrowDown, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useBreadcrumb } from "@/components/breadcrumb-provider";
 import AppBreadcrumb from "@/components/app-breadcrumb";
@@ -10,9 +9,9 @@ import { useLangGraphAgent } from "@/hooks/useLangGraphAgent/useLangGraphAgent";
 import { AgentState, InterruptValue, ResumeValue } from "./agent-types";
 import { useParams } from "next/navigation";
 import { useChatStore } from "@/stores/chat-store";
-import { AppCheckpoint, GraphNode } from "@/hooks/useLangGraphAgent/types";
+import { AppCheckpoint } from "@/hooks/useLangGraphAgent/types";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Step, StepCard } from "./components/task-step";
+import { Step } from "./components/task-step";
 import StepsBoard from "./components/task-step-board";
 
 const modelosMock = [
@@ -37,14 +36,17 @@ const modelosMock = [
 const etapasMock: Step[] = [
   {
     id: 1,
-    name: "Iniciar tarefa",
-    instruction: "Tarefa criada e inicializada.",
+    name: "Consultar caixa de e-mail",
+    instruction:
+      "Utilize a ferramenta 'ConsultaEmail' para consultar a caixa de e-mails.",
+    details: "Sucesso! Foram encontrados 10 e-mails na caixa de entrada.",
     status: "done",
   },
   {
     id: 2,
     name: "Processando dados",
     instruction: "O agente está processando os dados.",
+    details: "",
     status: "in_progress",
   },
   {
@@ -70,7 +72,7 @@ export default function TaskPlaygroundPage() {
 
   const threadId = "987e7fd5-cd27-4493-8f0c-6cfb47326808";
   const [flowData, setFlowData] = useState("");
-  const [toolName, setToolName] = useState("");
+  // const [toolName, setToolName] = useState("");
   const [settingsJson, setSettingsJson] = useState("");
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
@@ -108,16 +110,11 @@ export default function TaskPlaygroundPage() {
     );
   };
 
-  const {
-    status,
-    appCheckpoints,
-    run,
-    resume,
-    replay,
-    restore,
-    stop,
-    restoring,
-  } = useLangGraphAgent<AgentState, InterruptValue, ResumeValue>({
+  const { status, appCheckpoints, restore, restoring } = useLangGraphAgent<
+    AgentState,
+    InterruptValue,
+    ResumeValue
+  >({
     onCheckpointStart,
     onCheckpointEnd,
     onCheckpointStateUpdate,
@@ -242,17 +239,6 @@ export default function TaskPlaygroundPage() {
             </div>
             <div className="mb-4">
               <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1">
-                Ferramentas
-              </label>
-              <Input
-                className="w-full bg-neutral-200 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 text-neutral-800 dark:text-neutral-100 placeholder:text-neutral-500 rounded px-3 py-2"
-                placeholder="Nome da ferramenta"
-                value={toolName}
-                onChange={(e) => setToolName(e.target.value)}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1">
                 Configurações
               </label>
               <Textarea
@@ -298,21 +284,17 @@ export default function TaskPlaygroundPage() {
                 className="bg-green-100 text-green-700 hover:bg-green-200
                        dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800"
               >
+                <Save />
                 Salvar Tarefa
               </Button>
             </div>
           </div>
 
           {/* Etapas da Tarefa */}
-          <div className="space-y-2 max-w-2xl mx-auto w-full">
-            <StepsBoard></StepsBoard>
+          <div className="mx-auto w-full">
+            <StepsBoard steps={etapasMock} />
           </div>
 
-          <div className="space-y-2 max-w-2xl mx-auto w-full">
-            {etapasMock.map((etapa) => (
-              <StepCard key={etapa.id} etapa={etapa} />
-            ))}
-          </div>
           {showScrollButton && (
             <Button
               className="fixed bottom-28 right-8 rounded-full shadow-md"

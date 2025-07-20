@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/ui/modal";
 import { Input } from "@/components/ui/input";
-import { Trash2 } from "lucide-react";
+import { Plus, Save, Trash2 } from "lucide-react";
 import { ConfigField, TaskConfig } from "./types";
 
 type ConfigModalProps = {
@@ -63,6 +63,7 @@ export default function ConfigModal({
         <>
           <Button onClick={onClose}>Cancelar</Button>
           <Button className="bg-green-600 text-white" onClick={handleSave}>
+            <Save />
             Salvar
           </Button>
         </>
@@ -117,7 +118,7 @@ export default function ConfigModal({
           onClick={handleAdd}
           type="button"
         >
-          + Adicionar
+          <Plus /> Adicionar
         </Button>
       </div>
     </Modal>

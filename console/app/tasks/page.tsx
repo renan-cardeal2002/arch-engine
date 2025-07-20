@@ -3,7 +3,7 @@
 import AppBreadcrumb from "@/components/app-breadcrumb";
 import { useBreadcrumb } from "@/components/breadcrumb-provider";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Eye, Cog } from "lucide-react";
+import { Edit, Trash2, Eye, Cog, Plus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import ConfigModal from "./components/config-modal";
@@ -57,7 +57,8 @@ export default function TasksPage() {
           dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800
         "
         >
-          + Nova tarefa
+          <Plus />
+          Nova tarefa
         </Button>
       </div>
 

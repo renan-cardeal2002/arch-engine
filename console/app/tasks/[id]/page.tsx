@@ -5,7 +5,7 @@ import { useBreadcrumb } from "@/components/breadcrumb-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { AlignLeft, Barcode, Box } from "lucide-react";
+import { AlignLeft, Barcode, Box, Plus, Save } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -53,7 +53,8 @@ export default function TaskPage() {
             dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800
             "
         >
-          + Nova carga de trabalho
+          <Plus />
+          Nova carga de trabalho
         </Button>
       </div>
 
@@ -135,6 +136,7 @@ export default function TaskPage() {
                 dark:bg-green-500 dark:text-neutral-900 dark:hover:bg-green-400
             "
           >
+            <Save />
             Salvar instruções
           </Button>
         </div>
@@ -157,7 +159,7 @@ export default function TaskPage() {
                     dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800
                 "
           >
-            + Novo agente
+            <Plus /> Novo agente
           </Button>
         </div>
         <Input

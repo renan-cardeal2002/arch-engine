@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Sidebar,
   SidebarContent,
@@ -12,21 +12,21 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarGroupLabel,
-  SidebarGroupAction
-} from "@/components/ui/sidebar"
-import { Bot, Plus, MessageSquare, Terminal, Cog } from "lucide-react"
-import { useChatStore } from "@/stores/chat-store"
-import ThemeSwitcher from "./theme-switcher"
+  SidebarGroupAction,
+} from "@/components/ui/sidebar";
+import { Bot, Plus, MessageSquare, Terminal, Cog } from "lucide-react";
+import { useChatStore } from "@/stores/chat-store";
+import ThemeSwitcher from "./theme-switcher";
 
 export function AppSidebar() {
-  const pathname = usePathname()
-  const router = useRouter()
-  const { chats, addChat } = useChatStore()
+  const pathname = usePathname();
+  const router = useRouter();
+  const { chats, addChat } = useChatStore();
 
   const handleAddChat = () => {
-    const newChat = addChat()
-    router.push(`/chat/${newChat.id}`)
-  }
+    const newChat = addChat();
+    router.push(`/chat/${newChat.id}`);
+  };
 
   return (
     <Sidebar>
@@ -53,7 +53,10 @@ export function AppSidebar() {
           <SidebarMenu>
             {chats.map((chat) => (
               <SidebarMenuItem key={chat.id}>
-                <SidebarMenuButton asChild isActive={pathname === `/chat/${chat.id}`}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === `/chat/${chat.id}`}
+                >
                   <Link href={`/chat/${chat.id}`}>
                     <MessageSquare />
                     <span>{chat.name}</span>
@@ -63,28 +66,22 @@ export function AppSidebar() {
             ))}
           </SidebarMenu>
         </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel>Flows</SidebarGroupLabel>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname === '/tasks'}>
-                <Link href="/tasks">Task Flows</Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link href="http://localhost:3333" target="_blank" rel="noopener noreferrer">
-                  <Terminal />
-                  <span>Console</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <Link
+                href="http://localhost:3333"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Terminal />
+                <span>Console</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
       <SidebarFooter>
         <div className="flex flex-col items-center text-sm gap-4">
@@ -92,5 +89,5 @@ export function AppSidebar() {
         </div>
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

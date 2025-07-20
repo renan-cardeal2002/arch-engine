@@ -1,20 +1,19 @@
 import uvicorn
-from langgraph.types import Command, Interrupt
+from langgraph.types import Command
 from fastapi import FastAPI, Request, HTTPException, Form
 from fastapi.responses import Response
 from twilio.twiml.messaging_response import MessagingResponse
 from langchain_core.messages import HumanMessage
 from fastapi.middleware.cors import CORSMiddleware
 from sse_starlette.sse import EventSourceResponse
-from typing import AsyncGenerator, Dict, List
+from typing import AsyncGenerator, Dict
 from app.utils import message_chunk_event, interrupt_event, custom_event, checkpoint_event, format_state_snapshot
 from contextlib import asynccontextmanager
 import asyncio
 import argparse
 
 from app.main import init_agent
-from app.agent.task_flow import init_task_flow, Task
-from app.settings import ConfigField, get_service_settings, save_service_settings
+from app.agent.task_flow import Task
 
 # Track active connections
 active_connections: Dict[str, asyncio.Event] = {}
@@ -109,7 +108,7 @@ async def _handle_agent_request(body: dict) -> EventSourceResponse:
     flow_data = body.get("flow_data")
     req_settings = body.get("settings", {})
 
-    db_fields = get_service_settings(service_id) if service_id is not None else []
+    db_fields = []
     settings_dict = {f["key"]: f["value"] for f in db_fields}
     if isinstance(req_settings, dict):
         settings_dict.update(req_settings)
@@ -197,71 +196,6 @@ async def agent(request: Request):
     """Endpoint for running the agent."""
     body = await request.json()
     return await _handle_agent_request(body)
-
-
-@app.post("/service-agent/{service_id}")
-async def service_agent(service_id: str, request: Request):
-    """Run the agent for a specific service with defaults."""
-    body = await request.json()
-    body["service_id"] = service_id
-    return await _handle_agent_request(body)
-
-
-@app.get("/service-settings/{service_id}")
-async def get_service_settings_endpoint(service_id: str):
-    """Return stored settings for a service."""
-    fields = get_service_settings(service_id)
-    return {"fields": fields}
-
-
-@app.post("/service-settings/{service_id}")
-async def save_service_settings_endpoint(service_id: str, request: Request):
-    """Save settings for a service."""
-    body = await request.json()
-    fields = body.get("fields", [])
-    if not isinstance(fields, list):
-        raise HTTPException(status_code=400, detail="fields must be a list")
-    save_service_settings(service_id, fields)
-    return {"status": "saved", "count": len(fields)}
-
-
-@app.post("/tasks/create")
-async def create_tasks(request: Request):
-    body = await request.json()
-    thread_id = body.get("thread_id")
-    if not thread_id:
-        raise HTTPException(status_code=400, detail="thread_id is required")
-
-    tasks_input = body.get("tasks", [])
-    tasks: list[Task] = []
-    for t in tasks_input:
-        tasks.append(
-            {
-                "description": t.get("description", ""),
-                "tool": t.get("tool"),
-                "args": t.get("args", {}),
-                "status": "pending",
-                "result": None,
-            }
-        )
-    task_storage[thread_id] = tasks
-    return {"status": "created", "count": len(tasks)}
-
-
-@app.post("/tasks/run")
-async def run_tasks(request: Request):
-    body = await request.json()
-    thread_id = body.get("thread_id")
-    if not thread_id:
-        raise HTTPException(status_code=400, detail="thread_id is required")
-
-    tasks = task_storage.get(thread_id)
-    if not tasks:
-        raise HTTPException(status_code=404, detail="no tasks for thread_id")
-
-    graph_task, state = await init_task_flow(tasks, use_mcp=use_mcp)
-    await graph_task.ainvoke(state, config=None)
-    return {"tasks": tasks}
 
 
 @app.post("/twilio/whatsapp")

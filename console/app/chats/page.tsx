@@ -2,7 +2,7 @@
 import AppBreadcrumb from "@/components/app-breadcrumb";
 import { useBreadcrumb } from "@/components/breadcrumb-provider";
 import Modal from "@/components/ui/modal";
-import { Edit, Trash2, Eye, Cog } from "lucide-react";
+import { Edit, Trash2, Eye, Cog, Plus, Save } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -115,7 +115,8 @@ export default function ChatsPage() {
           dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800
         "
         >
-          + Novo Chat
+          <Plus />
+          Novo Chat
         </Button>
       </div>
 
@@ -138,6 +139,7 @@ export default function ChatsPage() {
                 onClick={handleSave}
                 disabled={!name.trim() || !description.trim()}
               >
+                <Save />
                 Salvar
               </Button>
             </>

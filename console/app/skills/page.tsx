@@ -3,7 +3,7 @@
 import AppBreadcrumb from "@/components/app-breadcrumb";
 import { useBreadcrumb } from "@/components/breadcrumb-provider";
 import { Button } from "@/components/ui/button";
-import { Edit, Eye, Trash2 } from "lucide-react";
+import { Edit, Eye, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function SkillsPage() {
@@ -36,7 +36,8 @@ export default function SkillsPage() {
                dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800
             "
         >
-          + Nova habilidade
+          <Plus />
+          Nova habilidade
         </Button>
       </div>
 
