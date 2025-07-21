@@ -1,7 +1,7 @@
 "use client";
 
-import AppBreadcrumb from "@/components/app-breadcrumb";
 import { useBreadcrumb } from "@/components/breadcrumb-provider";
+import PageLayout from "@/components/page-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -41,23 +41,16 @@ export default function TaskPage() {
   }, [setItems, task]);
 
   return (
-    <div className="overflow-x-auto border-b border-t mt-10">
-      <div className="p-8">
-        <AppBreadcrumb />
-      </div>
-
-      <div className="flex justify-end pe-8">
+    <PageLayout
+      actions={
         <Button
-          className="
-            bg-green-100 text-green-700 hover:bg-green-200
-            dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800
-            "
+          className="bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800"
         >
           <Plus />
           Nova carga de trabalho
         </Button>
-      </div>
-
+      }
+    >
       <div className="flex flex-wrap gap-8 m-8">
         <div
           className="
@@ -189,6 +182,6 @@ export default function TaskPage() {
           </tbody>
         </table>
       </div>
-    </div>
+    </PageLayout>
   );
 }

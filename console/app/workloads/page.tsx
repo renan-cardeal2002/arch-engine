@@ -1,7 +1,7 @@
 'use client'
 
-import AppBreadcrumb from "@/components/app-breadcrumb";
 import { useBreadcrumb } from "@/components/breadcrumb-provider";
+import PageLayout from "@/components/page-layout";
 import { useEffect } from "react";
 
 export default function WorkloadsPage() {
@@ -14,11 +14,5 @@ export default function WorkloadsPage() {
       ]);
    }, [setItems]);
    
-   return (
-      <div className="overflow-x-auto border-b border-t mt-10">
-         <div className="p-8">
-            <AppBreadcrumb />
-         </div>
-      </div>
-   )
+   return <PageLayout />
 }

@@ -1,7 +1,7 @@
 "use client";
 
-import AppBreadcrumb from "@/components/app-breadcrumb";
 import { useBreadcrumb } from "@/components/breadcrumb-provider";
+import PageLayout from "@/components/page-layout";
 import { Button } from "@/components/ui/button";
 import { Edit, Eye, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -23,23 +23,16 @@ export default function KnowledgesPage() {
   }, [setItems]);
 
   return (
-    <div className="overflow-x-auto border-b border-t mt-10">
-      <div className="p-8">
-        <AppBreadcrumb />
-      </div>
-
-      <div className="flex justify-end pe-8">
+    <PageLayout
+      actions={
         <Button
-          className="
-               bg-green-100 text-green-700 hover:bg-green-200
-               dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800
-            "
+          className="bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800"
         >
           <Plus />
           Novo conhecimento
         </Button>
-      </div>
-
+      }
+    >
       <table className="min-w-full">
         <thead>
           <tr>
@@ -68,6 +61,6 @@ export default function KnowledgesPage() {
           ))}
         </tbody>
       </table>
-    </div>
+    </PageLayout>
   );
 }

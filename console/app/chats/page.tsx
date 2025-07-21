@@ -1,6 +1,6 @@
 "use client";
-import AppBreadcrumb from "@/components/app-breadcrumb";
 import { useBreadcrumb } from "@/components/breadcrumb-provider";
+import PageLayout from "@/components/page-layout";
 import Modal from "@/components/ui/modal";
 import { Edit, Trash2, Eye, Cog, Plus, Save } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -102,24 +102,17 @@ export default function ChatsPage() {
   }
 
   return (
-    <div className="overflow-x-auto border-b border-t mt-10">
-      <div className="p-8">
-        <AppBreadcrumb />
-      </div>
-
-      <div className="flex justify-end pe-8">
+    <PageLayout
+      actions={
         <Button
           onClick={handleCreate}
-          className="
-          bg-green-100 text-green-700 hover:bg-green-200
-          dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800
-        "
+          className="bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800"
         >
           <Plus />
           Novo Chat
         </Button>
-      </div>
-
+      }
+    >
       <Modal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -224,6 +217,6 @@ export default function ChatsPage() {
           ))}
         </tbody>
       </table>
-    </div>
+    </PageLayout>
   );
 }
