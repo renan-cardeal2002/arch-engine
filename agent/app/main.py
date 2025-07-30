@@ -25,8 +25,9 @@ async def chatbot(state: State):
 
     from langchain_openai import ChatOpenAI
     from langchain_core.messages import SystemMessage
-
-    llm = ChatOpenAI(model="gpt-4o-mini").bind_tools(tools)
+    
+    llm_model = state.get("llm_core_model", "gpt-4o-mini")
+    llm = ChatOpenAI(model=llm_model).bind_tools(tools)
     messages = list(state["messages"])
     system_prompt = state.get("system_prompt") or SYSTEM_PROMPT
     if system_prompt:

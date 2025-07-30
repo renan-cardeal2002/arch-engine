@@ -7,12 +7,12 @@ import {
   ArrowDown,
   Ellipsis,
   Save,
+  Cog,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useBreadcrumb } from "@/components/breadcrumb-provider";
-import AppBreadcrumb from "@/components/app-breadcrumb";
 import { useLangGraphAgent } from "@/hooks/useLangGraphAgent/useLangGraphAgent";
 import { AgentState, InterruptValue, ResumeValue } from "./agent-types";
 import { useParams } from "next/navigation";
@@ -24,6 +24,9 @@ import Reminder from "./components/reminder";
 import { Checkbox } from "@/components/ui/checkbox";
 import { NodeCard } from "./components/node-card";
 import { CheckpointCard } from "./components/checkpoint-card";
+import Modal from "@/components/ui/modal";
+import ConfigModal from "@/app/chats/components/config-modal";
+import { ChatConfig, ChatItem } from "@/app/chats/components/types";
 
 const modelosMock = [
   { value: "gpt-4o", label: "GPT-4o (2024)" },
@@ -67,6 +70,16 @@ export default function ChatPlaygroundPage() {
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
   const [showNodesinfo, setShowNodesinfo] = useState(false);
   const [restoreError, setRestoreError] = useState(false);
+  const [showModalConfig, setShowModalConfig] = useState(false);
+  const [configModalOpen, setConfigModalOpen] = useState(true);
+  const [configModalItem, setConfigModalItem] = useState<ChatItem | null>(null);
+
+  function handleConfigSave(config: ChatConfig) {
+    if (configModalItem) {
+      setConfigModalOpen(false);
+      setConfigModalItem(null);
+    }
+  }
 
   useEffect(() => {
     setSystemPrompt(chatItem?.systemPrompt || "");
@@ -216,16 +229,14 @@ export default function ChatPlaygroundPage() {
   }, [setItems]);
 
   return (
-    <div className="bg-white dark:bg-neutral-950 max-h-screen border-b border-t mt-10">
-      <div className="p-4 md:p-8 pb-0">
-        <AppBreadcrumb />
-      </div>
-      <div className="flex flex-col md:flex-row max-h-[100vh]">
-        {/* SIDEBAR */}
-        <aside className="w-full md:w-80 min-w-0 md:min-w-[250px] md:max-w-[320px] border-b md:border-b-0 md:border-r border-neutral-200 dark:border-neutral-800 flex flex-col pt-4 z-10">
-          <div className="px-4 md:px-8 pb-4 mt-2 md:mt-10">
-            {/* Model */}
-            <div className="mb-4">
+    <div className="flex-1 flex flex-col h-screen">
+      <Modal open={showModalConfig} onClose={() => setShowModalConfig(false)}>
+        <div className="p-6 space-y-6 max-w-4xl w-full mx-auto">
+          <h2 className="text-xl font-bold">Configurações</h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Modelo */}
+            <div>
               <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1">
                 Modelo
               </label>
@@ -241,7 +252,9 @@ export default function ChatPlaygroundPage() {
                 ))}
               </select>
             </div>
-            <div className="mb-4 flex items-center gap-2">
+
+            {/* Checkbox */}
+            <div className="flex items-end gap-2">
               <Checkbox
                 id="show-nodesinfo"
                 checked={showNodesinfo}
@@ -251,24 +264,28 @@ export default function ChatPlaygroundPage() {
               />
               <label
                 htmlFor="show-nodesinfo"
-                className="text-xs font-medium leading-none text-neutral-600 dark:text-neutral-400"
+                className="text-xs font-medium text-neutral-600 dark:text-neutral-400"
               >
                 Mostrar info gráficos
               </label>
             </div>
-            <div className="mb-4">
+
+            {/* Flow Data */}
+            <div className="col-span-2">
               <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1">
                 Flow Data
               </label>
               <Textarea
-                className="font-mono bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 border border-neutral-300 dark:border-neutral-800 rounded"
+                className="font-mono w-full bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 border border-neutral-300 dark:border-neutral-800 rounded"
                 rows={3}
                 placeholder='{"key": "value"}'
                 value={flowData}
                 onChange={(e) => setFlowData(e.target.value)}
               />
             </div>
-            <div className="mb-4">
+
+            {/* Ferramentas */}
+            <div className="col-span-2">
               <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1">
                 Ferramentas
               </label>
@@ -279,25 +296,37 @@ export default function ChatPlaygroundPage() {
                 onChange={(e) => setToolName(e.target.value)}
               />
             </div>
-            <div className="mb-4">
+
+            {/* Configurações */}
+
+            <div className="col-span-2">
+              {/* <ConfigModal
+                open={configModalOpen}
+                onClose={() => setConfigModalOpen(false)}
+                config={configModalItem?.config}
+                onSave={handleConfigSave}
+              /> */}
+
               <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1">
                 Configurações
               </label>
               <Textarea
-                className="font-mono bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 border border-neutral-300 dark:border-neutral-800 rounded"
+                className="font-mono w-full bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 border border-neutral-300 dark:border-neutral-800 rounded"
                 rows={3}
                 placeholder='{"key": "value"}'
                 value={settingsJson}
                 onChange={(e) => setSettingsJson(e.target.value)}
               />
             </div>
-            <div>
+
+            {/* System Prompt */}
+            <div className="col-span-2">
               <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1">
                 System message
               </label>
               <Textarea
-                className="font-mono bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 border border-neutral-300 dark:border-neutral-800 rounded"
-                rows={8}
+                className="font-mono w-full bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 border border-neutral-300 dark:border-neutral-800 rounded"
+                rows={6}
                 placeholder="Describe desired model behavior (tone, tool usage, response style)"
                 value={systemPrompt}
                 onChange={(e) => {
@@ -307,185 +336,186 @@ export default function ChatPlaygroundPage() {
               />
             </div>
           </div>
-        </aside>
+        </div>
+      </Modal>
 
-        {/* MAIN CHAT */}
-        <main className="flex-1 flex flex-col bg-neutral-50 dark:bg-neutral-950">
-          {/* Topbar */}
-          <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900">
-            <div>
-              <span className="text-lg font-semibold mr-4 text-neutral-900 dark:text-neutral-100">
-                Novo Chat
-              </span>
-              <span className="bg-neutral-200 dark:bg-neutral-900 px-2 py-1 rounded text-xs text-neutral-600 dark:text-neutral-400">
-                Rascunho <span className="text-neutral-400">- {threadId}</span>
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                className="bg-green-100 text-green-700 hover:bg-green-200
-                       dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800"
-              >
-                <Save />
-                Salvar Chat
-              </Button>
-            </div>
-          </div>
-
-          {/* Histórico */}
-          <div
-            ref={messagesContainerRef}
-            className="
-              max-w-xl md:max-w-2xl mx-auto w-full 
-              bg-neutral-100 dark:bg-neutral-900 
-              rounded-xl shadow p-4 
-              max-h-[65vh] overflow-y-auto
-            "
+      {/* Topbar */}
+      <div className="flex items-center flex-shrink justify-between p-4 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900">
+        <div>
+          <span className="text-lg font-semibold mr-4 text-neutral-900 dark:text-neutral-100">
+            Novo Chat
+          </span>
+          <span className="bg-neutral-200 dark:bg-neutral-900 px-2 py-1 rounded text-xs text-neutral-600 dark:text-neutral-400">
+            Rascunho <span className="text-neutral-400">- {threadId}</span>
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            className="bg-neutral-100 text-neutral-700 hover:bg-neutral-200
+                       dark:bg-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-800"
+            onClick={() => setShowModalConfig(true)}
           >
-            <div className="space-y-2 max-w-2xl mx-auto w-full">
-              {appCheckpoints.map((checkpoint) => (
-                <div
-                  key={checkpoint.checkpointConfig.configurable.checkpoint_id}
-                  className="space-y-2"
-                >
-                  {showNodesinfo && (
-                    <CheckpointCard
-                      thread_id={threadId}
-                      appCheckpoint={checkpoint}
-                      replayHandler={replay}
-                    />
-                  )}
-                  {checkpoint.error
-                    ? renderCheckpointError(checkpoint)
-                    : checkpoint.nodes.map((node, nodeIndex) => (
-                        <div key={nodeIndex} className="space-y-2">
-                          {showNodesinfo && <NodeCard node={node} />}
-                          {renderNode(checkpoint, node)}
-                        </div>
-                      ))}
-                </div>
-              ))}
-              {(status === "running" || restoring) && (
-                <div className="flex items-center justify-center p-4">
-                  <Ellipsis className="w-6 h-6 text-muted-foreground animate-pulse" />
-                </div>
-              )}
-              {status === "error" && (
-                <div className="text-sm text-red-500 font-medium font-mono p-2 bg-red-50 rounded-md flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4" />
-                  Error running agent.
-                </div>
-              )}
-              {restoreError && (
-                <div className="text-sm text-red-500 font-medium font-mono p-2 bg-red-50 rounded-md flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4" />
-                  Error restoring agent. Check if agent server is running.
-                </div>
-              )}
-            </div>
+            <Cog />
+            Configurações
+          </Button>
+          <Button
+            className="bg-green-100 text-green-700 hover:bg-green-200
+                       dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800"
+          >
+            <Save />
+            Salvar Chat
+          </Button>
+        </div>
+      </div>
 
-            {showScrollButton && (
+      {/* Histórico */}
+      <div
+        ref={messagesContainerRef}
+        className="
+              mx-auto w-full 
+              rounded-xl shadow p-4 
+              overflow-y-auto mt-2
+            "
+      >
+        <div className="space-y-2 max-w-2xl mx-auto w-full">
+          {appCheckpoints.map((checkpoint) => (
+            <div
+              key={checkpoint.checkpointConfig.configurable.checkpoint_id}
+              className="space-y-2"
+            >
+              {showNodesinfo && (
+                <CheckpointCard
+                  thread_id={threadId}
+                  appCheckpoint={checkpoint}
+                  replayHandler={replay}
+                />
+              )}
+              {checkpoint.error
+                ? renderCheckpointError(checkpoint)
+                : checkpoint.nodes.map((node, nodeIndex) => (
+                    <div key={nodeIndex} className="space-y-2">
+                      {showNodesinfo && <NodeCard node={node} />}
+                      {renderNode(checkpoint, node)}
+                    </div>
+                  ))}
+            </div>
+          ))}
+          {(status === "running" || restoring) && (
+            <div className="flex items-center justify-center p-4">
+              <Ellipsis className="w-6 h-6 text-muted-foreground animate-pulse" />
+            </div>
+          )}
+          {status === "error" && (
+            <div className="text-sm text-red-500 font-medium font-mono p-2 bg-red-50 rounded-md flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4" />
+              Error running agent.
+            </div>
+          )}
+          {restoreError && (
+            <div className="text-sm text-red-500 font-medium font-mono p-2 bg-red-50 rounded-md flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4" />
+              Error restoring agent. Check if agent server is running.
+            </div>
+          )}
+        </div>
+
+        {showScrollButton && (
+          <Button
+            className="fixed bottom-28 right-8 rounded-full shadow-md"
+            size="icon"
+            variant="outline"
+            onClick={scrollToBottom}
+          >
+            <ArrowDown />
+          </Button>
+        )}
+      </div>
+
+      <div className="flex-shrink-0 p-2 pb-4">
+        <div className="max-w-2xl mx-auto">
+          <div className="relative">
+            <Textarea
+              ref={inputRef}
+              className="pr-24 resize-none font-mono"
+              placeholder="Enter your message..."
+              value={inputValue}
+              disabled={status === "running" || restoring}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  if (inputValue.trim() && status !== "running" && !restoring) {
+                    setRestoreError(false);
+                    run({
+                      thread_id: threadId,
+                      service_id: serviceId || undefined,
+                      flow_data: flowData || undefined,
+                      tool_name: toolName || undefined,
+                      settings: (() => {
+                        try {
+                          return settingsJson.trim() !== ""
+                            ? JSON.parse(settingsJson)
+                            : undefined;
+                        } catch {
+                          return undefined;
+                        }
+                      })(),
+                      state: {
+                        system_prompt: systemPrompt,
+                        llm_core_model: model || undefined,
+                        messages: [{ type: "user", content: inputValue }],
+                      },
+                    });
+                    setInputValue("");
+                  }
+                }
+              }}
+            />
+            {status === "running" ? (
               <Button
-                className="fixed bottom-28 right-8 rounded-full shadow-md"
+                className="absolute right-3 top-[50%] translate-y-[-50%]"
+                size="icon"
+                variant="destructive"
+                onClick={() => stop(threadId)}
+              >
+                <Square className="h-4 w-4" />
+              </Button>
+            ) : (
+              <Button
+                className="absolute right-3 top-[50%] translate-y-[-50%]"
                 size="icon"
                 variant="outline"
-                onClick={scrollToBottom}
+                disabled={!inputValue.trim() || restoring}
+                onClick={() => {
+                  if (inputValue.trim() && !restoring) {
+                    run({
+                      thread_id: threadId,
+                      service_id: serviceId || undefined,
+                      flow_data: flowData || undefined,
+                      tool_name: toolName || undefined,
+                      settings: (() => {
+                        try {
+                          return settingsJson.trim() !== ""
+                            ? JSON.parse(settingsJson)
+                            : undefined;
+                        } catch {
+                          return undefined;
+                        }
+                      })(),
+                      state: {
+                        system_prompt: systemPrompt,
+                        messages: [{ type: "user", content: inputValue }],
+                      },
+                    });
+                    setInputValue("");
+                  }
+                }}
               >
-                <ArrowDown />
+                <ArrowUp className="h-4 w-4" />
               </Button>
             )}
           </div>
-
-          <div className="flex-shrink-0 p-2 bg-neutral-50 dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800">
-            <div className="max-w-2xl mx-auto">
-              <div className="relative">
-                <Textarea
-                  ref={inputRef}
-                  className="pr-24 resize-none font-mono"
-                  placeholder="Enter your message..."
-                  value={inputValue}
-                  disabled={status === "running" || restoring}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      if (
-                        inputValue.trim() &&
-                        status !== "running" &&
-                        !restoring
-                      ) {
-                        setRestoreError(false);
-                        run({
-                          thread_id: threadId,
-                          service_id: serviceId || undefined,
-                          flow_data: flowData || undefined,
-                          tool_name: toolName || undefined,
-                          settings: (() => {
-                            try {
-                              return settingsJson.trim() !== ""
-                                ? JSON.parse(settingsJson)
-                                : undefined;
-                            } catch {
-                              return undefined;
-                            }
-                          })(),
-                          state: {
-                            system_prompt: systemPrompt,
-                            messages: [{ type: "user", content: inputValue }],
-                          },
-                        });
-                        setInputValue("");
-                      }
-                    }
-                  }}
-                />
-                {status === "running" ? (
-                  <Button
-                    className="absolute right-3 top-[50%] translate-y-[-50%]"
-                    size="icon"
-                    variant="destructive"
-                    onClick={() => stop(threadId)}
-                  >
-                    <Square className="h-4 w-4" />
-                  </Button>
-                ) : (
-                  <Button
-                    className="absolute right-3 top-[50%] translate-y-[-50%]"
-                    size="icon"
-                    variant="outline"
-                    disabled={!inputValue.trim() || restoring}
-                    onClick={() => {
-                      if (inputValue.trim() && !restoring) {
-                        run({
-                          thread_id: threadId,
-                          service_id: serviceId || undefined,
-                          flow_data: flowData || undefined,
-                          tool_name: toolName || undefined,
-                          settings: (() => {
-                            try {
-                              return settingsJson.trim() !== ""
-                                ? JSON.parse(settingsJson)
-                                : undefined;
-                            } catch {
-                              return undefined;
-                            }
-                          })(),
-                          state: {
-                            system_prompt: systemPrompt,
-                            messages: [{ type: "user", content: inputValue }],
-                          },
-                        });
-                        setInputValue("");
-                      }
-                    }}
-                  >
-                    <ArrowUp className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
-        </main>
+        </div>
       </div>
     </div>
   );

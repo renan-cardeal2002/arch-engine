@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Button } from "./button";
 
@@ -19,7 +19,7 @@ export default function Modal({ open, onClose, children, footer }: ModalProps) {
     >
       <div
         className="bg-white dark:bg-neutral-900 rounded-2xl p-6 min-w-[300px] max-w-full shadow-xl"
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         {children}
         <div className="mt-6 flex gap-2 justify-end">

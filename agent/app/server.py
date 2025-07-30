@@ -103,6 +103,7 @@ async def _handle_agent_request(body: dict) -> EventSourceResponse:
         raise HTTPException(status_code=400, detail="thread_id is required")
 
     system_prompt = body.get("system_prompt")
+    llm_core_model = body.get("llm_core_model")
 
     service_id = body.get("service_id")
     flow_data = body.get("flow_data")
@@ -124,6 +125,7 @@ async def _handle_agent_request(body: dict) -> EventSourceResponse:
     config = {"configurable": {"thread_id": thread_id}}
 
     if request_type == "run":
+        print(body)
         input = body.get("state", None) or {}
         if system_prompt is not None:
             input["system_prompt"] = system_prompt

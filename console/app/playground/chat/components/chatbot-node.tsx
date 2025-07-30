@@ -36,20 +36,34 @@ export function ChatbotNode({ nodeState }: ChatbotNodeProps) {
 
   return (
     <div className="space-y-4 font-mono">
-      {nodeState?.messages?.map((msg, index) => (
-        // When restoring data from checkpoint history, user input messages do not have an id.
-        // Use index as key to avoid React warnings.
-        <div key={msg.id ?? index} className="flex items-start gap-3">
+      {nodeState?.messages?.map((msg, index) => {
+        const isAi = msg.type === "ai";
+
+        return (
           <div
+            key={msg.id ?? index}
             className={cn(
-              "flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full border",
-              getMessageIcon(msg.type).className
+              "flex items-start gap-3",
+              isAi ? "flex-row" : "flex-row-reverse"
             )}
           >
-            {getMessageIcon(msg.type).icon}
-          </div>
-          <div className="flex-1 p-2 min-w-0">
-            <div className="text-foreground text-sm break-words">
+            {/* Ícone */}
+            <div
+              className={cn(
+                "flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full border",
+                getMessageIcon(msg.type).className
+              )}
+            >
+              {getMessageIcon(msg.type).icon}
+            </div>
+
+            {/* Mensagem */}
+            <div
+              className={cn(
+                "flex-1 p-2 min-w-0 text-sm break-words text-foreground",
+                isAi ? "text-left" : "text-right"
+              )}
+            >
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
@@ -84,20 +98,26 @@ export function ChatbotNode({ nodeState }: ChatbotNodeProps) {
               >
                 {msg.content}
               </ReactMarkdown>
+
+              {msg.tool_calls && msg.tool_calls.length > 0 && (
+                <div
+                  className={cn(
+                    "flex gap-2 mt-1",
+                    isAi ? "justify-start" : "justify-end"
+                  )}
+                >
+                  <span className="text-sm font-mono">Tool calls:</span>
+                  {msg.tool_calls.map((toolCall) => (
+                    <Badge key={toolCall.id} variant="outline">
+                      {toolCall.name}
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
-            {msg.tool_calls && msg.tool_calls.length > 0 && (
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-mono">Tool calls:</span>
-                {msg.tool_calls?.map((toolCall) => (
-                  <div key={toolCall.id}>
-                    <Badge variant="outline">{toolCall.name}</Badge>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

@@ -1,17 +1,23 @@
-/** 
+/**
  * Represents the current status of an agent:
  * - idle: agent is not running, waiting for user input
  * - running: agent is running
  * - stopping: stop request has been sent, waiting for agent to stop
- * - error: error has occurred calling agent. It can occur when the agent is not accessible 
+ * - error: error has occurred calling agent. It can occur when the agent is not accessible
  *          or when there is an error handling the request.
- * 
+ *
  * Note: If there is an error in the graph node, the error property will be set to true in GraphNode.
  */
-export type AgentStatus = 'idle' | 'running' | 'stopping' | 'error';
+export type AgentStatus = "idle" | "running" | "stopping" | "error";
 
 /** Represents LangGraph checkpoint config */
-export type CheckpointConfig = { configurable: { thread_id: string, checkpoint_id: string, checkpoint_ns: string } };
+export type CheckpointConfig = {
+  configurable: {
+    thread_id: string;
+    checkpoint_id: string;
+    checkpoint_ns: string;
+  };
+};
 
 /** Represents LangGraph checkpoint metadata */
 export type CheckpointMetadata = {
@@ -74,7 +80,7 @@ export interface Message {
   tool_calls?: ToolCall[];
 }
 
-export type ToolCall = { name: string, args: object, id: string };
+export type ToolCall = { name: string; args: object; id: string };
 
 /** Data of the message chunk event. */
 export interface NodeMessageChunk {
@@ -89,7 +95,7 @@ export interface MessageChunk {
   tool_call_chunks?: ToolCallChunk[];
 }
 
-export type ToolCallChunk = { name?: string, args?: object, id?: string };
+export type ToolCallChunk = { name?: string; args?: object; id?: string };
 
 /** Interface for states that have messages property.
  * Inherit this interface in your agent state interface if you use messages.
@@ -102,8 +108,12 @@ export interface WithMessages {
  * @param event - event type. Can be 'checkpoint', 'message_chunk', 'interrupt', 'custom', 'error'.
  */
 export interface AgentEvent<TAgentState, TInterruptValue> {
-  event: string
-  data: Checkpoint<TAgentState, TInterruptValue> | NodeMessageChunk | Interrupt<TInterruptValue>[] | TAgentState;
+  event: string;
+  data:
+    | Checkpoint<TAgentState, TInterruptValue>
+    | NodeMessageChunk
+    | Interrupt<TInterruptValue>[]
+    | TAgentState;
 }
 
 /** Generic interface for an agent input. Thread id is required. */
@@ -132,15 +142,18 @@ export interface ReplayAgentInput extends AgentInput {
   config: CheckpointConfig;
 }
 
-export interface RunAgentInputInternal<TAgentState> extends RunAgentInput<TAgentState> {
+export interface RunAgentInputInternal<TAgentState>
+  extends RunAgentInput<TAgentState> {
   type: "run";
 }
 
-export interface ResumeAgentInputInternal<TResumeValue> extends ResumeAgentInput<TResumeValue> {
+export interface ResumeAgentInputInternal<TResumeValue>
+  extends ResumeAgentInput<TResumeValue> {
   type: "resume";
 }
 
-export interface ForkAgentInputInternal<TAgentState> extends ForkAgentInput<TAgentState> {
+export interface ForkAgentInputInternal<TAgentState>
+  extends ForkAgentInput<TAgentState> {
   type: "fork";
 }
 

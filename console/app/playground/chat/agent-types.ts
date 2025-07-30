@@ -3,9 +3,13 @@ import { WithMessages } from "@/hooks/useLangGraphAgent/types";
 // The agent state which mirrors the LangGraph state. If your sate have messages, extend WithMessages interface.
 export interface AgentState extends WithMessages {
   system_prompt?: string;
+  llm_core_model?: string;
   weather_forecast: WeatherForecast[];
   context?: {
-    agent_state: { flow_data?: string | null; service_id?: number | string | null };
+    agent_state: {
+      flow_data?: string | null;
+      service_id?: number | string | null;
+    };
     settings: Record<string, any>;
   };
 }
@@ -17,7 +21,7 @@ export interface WeatherForecast {
 }
 
 // All possible interrupt types from the graph. We are using string for Reminder node
-export type InterruptValue = string | number | { "question": string };
+export type InterruptValue = string | number | { question: string };
 
 // All possible resume types to send to the graph. We are using string for Reminder node
 export type ResumeValue = string | number;

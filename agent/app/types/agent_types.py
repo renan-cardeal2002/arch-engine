@@ -17,6 +17,7 @@ class Weather(TypedDict):
 
 class State(MessagesState):
     system_prompt: str | None
+    llm_core_model: str | None
     weather_forecast: Annotated[list[Weather], operator.add]
     context: Context
 
