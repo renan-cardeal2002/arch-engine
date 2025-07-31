@@ -43,14 +43,14 @@ export function ChatbotNode({ nodeState }: ChatbotNodeProps) {
           <div
             key={msg.id ?? index}
             className={cn(
-              "flex items-start gap-3",
+              "flex items-start gap-3 border-b rounded",
               isAi ? "flex-row" : "flex-row-reverse"
             )}
           >
             {/* Ícone */}
             <div
               className={cn(
-                "flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full border",
+                "flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full border",
                 getMessageIcon(msg.type).className
               )}
             >

@@ -12,7 +12,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useBreadcrumb } from "@/components/breadcrumb-provider";
 import { useLangGraphAgent } from "@/hooks/useLangGraphAgent/useLangGraphAgent";
 import { AgentState, InterruptValue, ResumeValue } from "./agent-types";
 import { useParams } from "next/navigation";
@@ -25,7 +24,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { NodeCard } from "./components/node-card";
 import { CheckpointCard } from "./components/checkpoint-card";
 import Modal from "@/components/ui/modal";
-import ConfigModal from "@/app/chats/components/config-modal";
 import { ChatConfig, ChatItem } from "@/app/chats/components/types";
 
 const modelosMock = [
@@ -223,10 +221,6 @@ export default function ChatPlaygroundPage() {
   };
 
   const [model, setModel] = useState(modelosMock[0].value);
-  const { setItems } = useBreadcrumb();
-  useEffect(() => {
-    setItems([{ label: "Home", href: "/" }, { label: "Playground - Chat" }]);
-  }, [setItems]);
 
   return (
     <div className="flex-1 flex flex-col h-screen">
@@ -298,15 +292,7 @@ export default function ChatPlaygroundPage() {
             </div>
 
             {/* Configurações */}
-
             <div className="col-span-2">
-              {/* <ConfigModal
-                open={configModalOpen}
-                onClose={() => setConfigModalOpen(false)}
-                config={configModalItem?.config}
-                onSave={handleConfigSave}
-              /> */}
-
               <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1">
                 Configurações
               </label>
@@ -368,7 +354,7 @@ export default function ChatPlaygroundPage() {
         </div>
       </div>
 
-      {/* Histórico */}
+      {/* Body */}
       <div
         ref={messagesContainerRef}
         className="

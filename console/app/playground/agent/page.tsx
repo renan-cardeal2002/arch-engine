@@ -1,15 +1,13 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useBreadcrumb } from "@/components/breadcrumb-provider";
-import AppBreadcrumb from "@/components/app-breadcrumb";
-import { useLangGraphAgent } from "@/hooks/useLangGraphAgent/useLangGraphAgent";
-import { AgentState, InterruptValue, ResumeValue } from "./agent-types";
 import { useParams } from "next/navigation";
 import { useChatStore } from "@/stores/chat-store";
-import { AppCheckpoint } from "@/hooks/useLangGraphAgent/types";
 import { Checkbox } from "@/components/ui/checkbox";
+import Modal from "@/components/ui/modal";
+import { Button } from "@/components/ui/button";
+import { Cog, Save } from "lucide-react";
 
 const modelosMock = [
   { value: "gpt-4o", label: "GPT-4o (2024)" },
@@ -24,20 +22,14 @@ const modelosMock = [
   { value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo" },
   { value: "gpt-3.5-turbo-16k", label: "GPT-3.5 Turbo 16K" },
   { value: "gpt-3.5-turbo-instruct", label: "GPT-3.5 Turbo Instruct" },
-  // Extras populares de labs/alternativas
   { value: "gpt-4-1", label: "gpt-4.1 (Legacy)" },
   { value: "gpt-3.5", label: "gpt-3.5 (Legacy)" },
   { value: "gpt-3", label: "gpt-3" },
 ];
 
 export default function AgentPlaygroundPage() {
-  // new
   const params = useParams<{ id: string }>();
-  const messagesContainerRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
-
   const { chats, updateSystemPrompt } = useChatStore();
-
   const chatItem = chats.find((c) => c.id === params.id);
   const [systemPrompt, setSystemPrompt] = useState(
     chatItem?.systemPrompt || ""
@@ -47,91 +39,19 @@ export default function AgentPlaygroundPage() {
   const [flowData, setFlowData] = useState("");
   const [toolName, setToolName] = useState("");
   const [settingsJson, setSettingsJson] = useState("");
-  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
   const [showNodesinfo, setShowNodesinfo] = useState(false);
-
-  useEffect(() => {
-    setSystemPrompt(chatItem?.systemPrompt || "");
-  }, [chatItem?.systemPrompt]);
-
-  const onCheckpointStart = (
-    checkpoint: AppCheckpoint<AgentState, InterruptValue>
-  ) => {
-    console.log("Checkpoint started:", checkpoint.nodes);
-  };
-
-  const onCheckpointEnd = (
-    checkpoint: AppCheckpoint<AgentState, InterruptValue>
-  ) => {
-    console.log("Checkpoint ended:", checkpoint.nodes);
-
-    // Example how to do some application logic based on the agent flow. E.g. reminders list.
-    if (checkpoint.nodes.some((n) => n.name === "reminder")) {
-      console.log("Reminder created");
-    }
-  };
-
-  const onCheckpointStateUpdate = (
-    checkpoint: AppCheckpoint<AgentState, InterruptValue>
-  ) => {
-    console.log(
-      "Checkpoint intermediate state updated:",
-      checkpoint.nodes,
-      checkpoint.state
-    );
-  };
-
-  const { status, appCheckpoints, restoring } = useLangGraphAgent<
-    AgentState,
-    InterruptValue,
-    ResumeValue
-  >({
-    onCheckpointStart,
-    onCheckpointEnd,
-    onCheckpointStateUpdate,
-  });
-
-  // Focus input on page load and after message is sent
-  useEffect(() => {
-    const isInputEnabled = status !== "running" && !restoring;
-    if (inputRef.current && isInputEnabled) {
-      inputRef.current.focus();
-    }
-  }, [status, restoring]);
-
-  // Auto-scroll when new nodes appear
-  useEffect(() => {
-    if (shouldAutoScroll) {
-      scrollToBottom();
-    }
-  }, [appCheckpoints, shouldAutoScroll]);
-
-  const scrollToBottom = () => {
-    if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTo({
-        top: messagesContainerRef.current.scrollHeight,
-        behavior: "smooth",
-      });
-    }
-  };
-
+  const [showModalConfig, setShowModalConfig] = useState(false);
   const [model, setModel] = useState(modelosMock[0].value);
-  const { setItems } = useBreadcrumb();
-  useEffect(() => {
-    setItems([{ label: "Home", href: "/" }, { label: "Playground - Chat" }]);
-  }, [setItems]);
 
   return (
-    <div className="bg-white dark:bg-neutral-950 max-h-screen border-b border-t mt-10">
-      <div className="p-4 md:p-8 pb-0">
-        <AppBreadcrumb />
-      </div>
-      <div className="flex flex-col md:flex-row max-h-[100vh]">
-        {/* SIDEBAR */}
-        <aside className="w-full md:w-80 min-w-0 md:min-w-[250px] md:max-w-[320px] border-b md:border-b-0 md:border-r border-neutral-200 dark:border-neutral-800 flex flex-col pt-4 z-10">
-          <div className="px-4 md:px-8 pb-4 mt-2 md:mt-10">
-            {/* Model */}
-            <div className="mb-4">
+    <div className="flex-1 flex flex-col h-screen">
+      <Modal open={showModalConfig} onClose={() => setShowModalConfig(false)}>
+        <div className="p-6 space-y-6 max-w-4xl w-full mx-auto">
+          <h2 className="text-xl font-bold">Configurações</h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Modelo */}
+            <div>
               <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1">
                 Modelo
               </label>
@@ -147,7 +67,9 @@ export default function AgentPlaygroundPage() {
                 ))}
               </select>
             </div>
-            <div className="mb-4 flex items-center gap-2">
+
+            {/* Checkbox */}
+            <div className="flex items-end gap-2">
               <Checkbox
                 id="show-nodesinfo"
                 checked={showNodesinfo}
@@ -157,24 +79,28 @@ export default function AgentPlaygroundPage() {
               />
               <label
                 htmlFor="show-nodesinfo"
-                className="text-xs font-medium leading-none text-neutral-600 dark:text-neutral-400"
+                className="text-xs font-medium text-neutral-600 dark:text-neutral-400"
               >
                 Mostrar info gráficos
               </label>
             </div>
-            <div className="mb-4">
+
+            {/* Flow Data */}
+            <div className="col-span-2">
               <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1">
                 Flow Data
               </label>
               <Textarea
-                className="font-mono bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 border border-neutral-300 dark:border-neutral-800 rounded"
+                className="font-mono w-full bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 border border-neutral-300 dark:border-neutral-800 rounded"
                 rows={3}
                 placeholder='{"key": "value"}'
                 value={flowData}
                 onChange={(e) => setFlowData(e.target.value)}
               />
             </div>
-            <div className="mb-4">
+
+            {/* Ferramentas */}
+            <div className="col-span-2">
               <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1">
                 Ferramentas
               </label>
@@ -185,25 +111,29 @@ export default function AgentPlaygroundPage() {
                 onChange={(e) => setToolName(e.target.value)}
               />
             </div>
-            <div className="mb-4">
+
+            {/* Configurações */}
+            <div className="col-span-2">
               <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1">
                 Configurações
               </label>
               <Textarea
-                className="font-mono bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 border border-neutral-300 dark:border-neutral-800 rounded"
+                className="font-mono w-full bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 border border-neutral-300 dark:border-neutral-800 rounded"
                 rows={3}
                 placeholder='{"key": "value"}'
                 value={settingsJson}
                 onChange={(e) => setSettingsJson(e.target.value)}
               />
             </div>
-            <div>
+
+            {/* System Prompt */}
+            <div className="col-span-2">
               <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1">
                 System message
               </label>
               <Textarea
-                className="font-mono bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 border border-neutral-300 dark:border-neutral-800 rounded"
-                rows={8}
+                className="font-mono w-full bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 border border-neutral-300 dark:border-neutral-800 rounded"
+                rows={6}
                 placeholder="Describe desired model behavior (tone, tool usage, response style)"
                 value={systemPrompt}
                 onChange={(e) => {
@@ -213,17 +143,44 @@ export default function AgentPlaygroundPage() {
               />
             </div>
           </div>
-        </aside>
+        </div>
+      </Modal>
 
-        <main className="flex-1 flex flex-col bg-neutral-50 dark:bg-neutral-950">
-          <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900">
-            <div>
-              <span className="text-lg font-semibold mr-4 text-neutral-900 dark:text-neutral-100">
-                Agente
-              </span>
-            </div>
-          </div>
-        </main>
+      {/* Topbar */}
+      <div className="flex items-center flex-shrink justify-between p-4 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900">
+        <div>
+          <span className="text-lg font-semibold mr-4 text-neutral-900 dark:text-neutral-100">
+            Agente
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            className="bg-neutral-100 text-neutral-700 hover:bg-neutral-200
+                       dark:bg-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-800"
+            onClick={() => setShowModalConfig(true)}
+          >
+            <Cog />
+            Configurações
+          </Button>
+          <Button
+            className="bg-green-100 text-green-700 hover:bg-green-200
+                       dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800"
+          >
+            <Save />
+            Salvar Agente
+          </Button>
+        </div>
+      </div>
+
+      {/* Body */}
+      <div
+        className="
+              mx-auto w-full 
+              rounded-xl shadow p-4 
+              overflow-y-auto mt-2
+            "
+      >
+        <div className="space-y-2 max-w-2xl mx-auto w-full"></div>
       </div>
     </div>
   );
