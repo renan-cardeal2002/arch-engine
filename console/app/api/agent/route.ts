@@ -1,71 +1,92 @@
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
-// This API route serves as a proxy to the agent endpoint of the ai service.
-// It is necessary to send requests from the Next.js backend rather than the client.
-// This approach prevents exposing the AI service as a public endpoint and eliminates the need to implement authentication logic.
-// The mode elegant way is to use server actions, but it is not possible with streaming response.
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const TEMP_TOKEN = process.env.TEMP_TOKEN || "";
 
-const AGENT_URL = process.env.NEXT_PUBLIC_AGENT_URL;
+export async function _force_login() {
+  const cookieStore = cookies();
+
+  (await cookieStore).set("token", TEMP_TOKEN, {
+    httpOnly: false,
+    secure: true,
+    path: "/",
+    maxAge: 60 * 60 * 24,
+  });
+
+  return NextResponse.json({ success: true });
+}
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
-
   try {
-    const response = await fetch(`${AGENT_URL}/agent`, {
+    await _force_login();
+    const body = await request.json();
+
+    // Busca o token JWT do cookie
+    const cookieStore = cookies();
+    const token = (await cookieStore).get("token")?.value;
+
+    const response = await fetch(`${API_URL}/agent`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Accept: "text/event-stream",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(body),
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || "Failed to call agent");
+      throw new Error(data?.detail || "Erro ao criar a agente");
     }
 
-    const stream = new TransformStream();
-    const writer = stream.writable.getWriter();
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error("Erro na rota /agent:", error);
+    return NextResponse.json(
+      { error: (error as Error).message || "Erro desconhecido" },
+      { status: 500 }
+    );
+  }
+}
 
-    (async () => {
-      try {
-        const reader = response.body?.getReader();
-        if (!reader) throw new Error("No reader available");
+export async function GET(_request: NextRequest) {
+  try {
+    await _force_login();
+    const cookieStore = cookies();
+    const token = (await cookieStore).get("token")?.value;
 
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) {
-            await writer.close();
-            break;
-          }
-
-          // Just forward the raw chunks
-          await writer.write(value);
-        }
-      } catch (error) {
-        console.error("Stream processing error:", error);
-
-        // Write an error message to the stream before closing
-        const errorData = JSON.stringify({ error: "Error in agent" });
-        await writer.write(
-          new TextEncoder().encode(`event: error\ndata: ${errorData}\n\n`)
-        );
-        await writer.close();
-      }
-    })();
-
-    return new Response(stream.readable, {
+    const response = await fetch(`${API_URL}/agent`, {
+      method: "GET",
       headers: {
-        "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache",
-        Connection: "keep-alive",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
+
+    let data;
+
+    try {
+      data = await response.json();
+    } catch (jsonError) {
+      const text = await response.text();
+      console.error("Resposta não é JSON. Conteúdo bruto:", text);
+      throw new Error(`Erro ao buscar agentes: ${text}`);
+    }
+
+    if (!response.ok) {
+      console.error("Erro da API:", data);
+      throw new Error(
+        data?.detail || `Erro ${response.status} ao buscar agentes`
+      );
+    }
+
+    return NextResponse.json(data);
   } catch (error) {
-    console.error("Error in agent route", error);
+    console.error("Erro na rota /agent:", error);
     return NextResponse.json(
-      { error: "Failed to process /agent request" },
+      { error: (error as Error).message || "Erro desconhecido" },
       { status: 500 }
     );
   }
