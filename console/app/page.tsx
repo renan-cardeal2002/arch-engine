@@ -1,22 +1,9 @@
 "use client";
 
-import { backendFetch } from "@/lib/backend";
-import { useRouter } from "next/navigation";
-
-export default async function WelcomePage() {
-  const router = useRouter();
-  const meRes = await backendFetch("/me"); // tua rota protegida no Go
-  if (!meRes.ok) {
-    // se token inválido/expirado, opcionalmente lançar redirect aqui
-    // import { redirect } from "next/navigation"; redirect("/login");
-  }
-  const me = meRes.ok ? await meRes.json() : null;
-
+export default function WelcomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background/80 to-primary/5 flex items-center">
-      <pre className="text-sm">{JSON.stringify(me, null, 2)}</pre>
       <div className="container px-4 py-8 mx-auto space-y-12">
-        {/* Hero Section */}
         <div className="text-center space-y-3 max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
             Seja bem vindo ao Console Geckos AI
@@ -24,14 +11,12 @@ export default async function WelcomePage() {
           <div className="h-1 w-20 bg-primary mx-auto rounded-full" />
         </div>
 
-        {/* About Section */}
         <div className="max-w-3xl mx-auto text-center space-y-4">
           <p className="text-lg text-muted-foreground leading-relaxed">
             A nossa plataforma de criação agentes de IA!
           </p>
         </div>
 
-        {/* Capabilities Section */}
         <div className="space-y-8">
           <h3 className="text-3xl font-semibold text-center">
             Saiba como você pode usar a nossa ferramenta

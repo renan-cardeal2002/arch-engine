@@ -21,13 +21,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Supondo que o backend retorne { token: "jwt..." }
   const { token } = await resp.json();
 
   // Opcional: extrair exp do JWT pra setar Max-Age coerente
   const [, payloadB64] = token.split(".");
   const payload = JSON.parse(Buffer.from(payloadB64, "base64").toString());
-  const expSeconds: number | undefined = payload?.exp; // epoch seconds
+  const expSeconds: number | undefined = payload?.exp;
   const maxAge = expSeconds
     ? Math.max(0, expSeconds - Math.floor(Date.now() / 1000))
     : 60 * 60 * 24;
@@ -37,7 +36,7 @@ export async function POST(req: NextRequest) {
     secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge, // alinha a expiração do cookie com o exp do JWT (quando disponível)
+    maxAge,
   });
 
   return NextResponse.json({ ok: true });
