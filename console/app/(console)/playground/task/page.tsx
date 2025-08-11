@@ -11,7 +11,7 @@ import StepsBoard from "./components/task-step-board";
 import { Input } from "@/components/ui/input";
 import Modal from "@/components/ui/modal";
 
-const modelosMock = [
+const modelosMock = [ // # mock
   { value: "gpt-4o", label: "GPT-4o (2024)" },
   { value: "gpt-4-0125-preview", label: "GPT-4 Turbo (0125)" },
   { value: "gpt-4-1106-preview", label: "GPT-4 Turbo (1106)" },
@@ -29,7 +29,7 @@ const modelosMock = [
   { value: "gpt-3", label: "gpt-3" },
 ];
 
-const etapasMock: Step[] = [
+const etapasMock: Step[] = [ // # mock
   {
     id: 1,
     name: "Consultar caixa de e-mail",
@@ -73,7 +73,7 @@ export default function TaskPlaygroundPage() {
     setSystemPrompt(chatItem?.systemPrompt || "");
   }, [chatItem?.systemPrompt]);
 
-  const [model, setModel] = useState(modelosMock[0].value);
+  const [model, setModel] = useState(modelosMock[0].value); // # mock
 
   return (
     <div className="flex-1 flex flex-col h-screen">
@@ -92,7 +92,7 @@ export default function TaskPlaygroundPage() {
                 value={model}
                 onChange={(e) => setModel(e.target.value)}
               >
-                {modelosMock.map((m) => (
+                {modelosMock.map((m) => ( // # mock
                   <option key={m.value} value={m.value}>
                     {m.label}
                   </option>
@@ -209,7 +209,7 @@ export default function TaskPlaygroundPage() {
 
       {/* Body */}
       <div className="mx-auto w-full">
-        <StepsBoard steps={etapasMock} />
+        <StepsBoard steps={etapasMock} /> {/* # mock */}
       </div>
     </div>
   );
