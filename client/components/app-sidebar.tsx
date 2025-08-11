@@ -14,7 +14,7 @@ import {
   SidebarGroupLabel,
   SidebarGroupAction,
 } from "@/components/ui/sidebar";
-import { Bot, Plus, MessageSquare, Terminal, Cog } from "lucide-react";
+import { Bot, Plus, MessageSquare, Terminal } from "lucide-react";
 import { useChatStore } from "@/stores/chat-store";
 import ThemeSwitcher from "./theme-switcher";
 
