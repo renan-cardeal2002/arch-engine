@@ -39,7 +39,7 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/">
+              <Link href="/dashboard">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-green-600 text-sidebar-primary-foreground">
                   <Bot className="size-4" />
                 </div>
@@ -54,8 +54,8 @@ export function AppSidebar() {
           {/* <SidebarGroupLabel>Principal</SidebarGroupLabel> */}
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname === "/"}>
-                <Link href="/">
+              <SidebarMenuButton asChild isActive={pathname === "/dashboard"}>
+                <Link href="/dashboard">
                   <House />
                   Início
                 </Link>
