@@ -9,7 +9,7 @@ import Modal from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Cog, Save } from "lucide-react";
 
-const modelosMock = [
+const modelosMock = [ // # mock
   { value: "gpt-4o", label: "GPT-4o (2024)" },
   { value: "gpt-4-0125-preview", label: "GPT-4 Turbo (0125)" },
   { value: "gpt-4-1106-preview", label: "GPT-4 Turbo (1106)" },
@@ -41,7 +41,7 @@ export default function AgentPlaygroundPage() {
   const [settingsJson, setSettingsJson] = useState("");
   const [showNodesinfo, setShowNodesinfo] = useState(false);
   const [showModalConfig, setShowModalConfig] = useState(false);
-  const [model, setModel] = useState(modelosMock[0].value);
+  const [model, setModel] = useState(modelosMock[0].value); // # mock
 
   return (
     <div className="flex-1 flex flex-col h-screen">
@@ -60,7 +60,7 @@ export default function AgentPlaygroundPage() {
                 value={model}
                 onChange={(e) => setModel(e.target.value)}
               >
-                {modelosMock.map((m) => (
+                {modelosMock.map((m) => ( // # mock
                   <option key={m.value} value={m.value}>
                     {m.label}
                   </option>

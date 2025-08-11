@@ -5,13 +5,13 @@ import Modal from "@/components/ui/modal";
 import { Cog, Save } from "lucide-react";
 import { useState } from "react";
 
-const endpointsMock = [
+const endpointsMock = [ // # mock
   { value: "1", label: "Local" },
   { value: "2", label: "Produção" },
   { value: "3", label: "Homologação" },
 ];
 
-const typesMock = [
+const typesMock = [ // # mock
   { value: "1", label: "String" },
   { value: "2", label: "Boolean" },
   { value: "3", label: "Integer" },
@@ -23,12 +23,12 @@ export default function ToolPlaygroundPage() {
   const [tool, setTool] = useState("");
   const [params, setParams] = useState("");
   const [type, setType] = useState("");
-  const [endpoint, setEndpoint] = useState(endpointsMock[0].value);
+  const [endpoint, setEndpoint] = useState(endpointsMock[0].value); // # mock
   const [result, setResult] = useState<string | null>(null);
   const [showModalConfig, setShowModalConfig] = useState(false);
 
   function handleTest() {
-    setResult(`(Mock) Executou tool "${tool}" com params: ${params}`);
+    setResult(`(Mock) Executou tool "${tool}" com params: ${params}`); // # mock
   }
 
   return (
@@ -48,7 +48,7 @@ export default function ToolPlaygroundPage() {
                 value={endpoint}
                 onChange={(e) => setEndpoint(e.target.value)}
               >
-                {endpointsMock.map((m) => (
+                {endpointsMock.map((m) => ( // # mock
                   <option key={m.value} value={m.value}>
                     {m.label}
                   </option>
@@ -72,7 +72,7 @@ export default function ToolPlaygroundPage() {
                 value={type}
                 onChange={(e) => setType(e.target.value)}
               >
-                {typesMock.map((m) => (
+                {typesMock.map((m) => ( // # mock
                   <option key={m.value} value={m.value}>
                     {m.label}
                   </option>

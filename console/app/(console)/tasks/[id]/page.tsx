@@ -9,7 +9,7 @@ import { AlignLeft, Barcode, Box, Plus, Save } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const tasksMock = [
+const tasksMock = [ // # mock
   {
     id: 1,
     name: "Gerador de orçamentos",
@@ -26,7 +26,7 @@ export default function TaskPage() {
   const router = useRouter();
   const [instructions, setInstructions] = useState("");
 
-  const task = tasksMock.find((t) => t.id === Number(id));
+  const task = tasksMock.find((t) => t.id === Number(id)); // # mock
 
   if (!task) {
     return <div className="p-8 text-red-600">Task não encontrada</div>;
