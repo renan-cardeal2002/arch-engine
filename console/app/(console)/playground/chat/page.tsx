@@ -24,7 +24,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { NodeCard } from "./components/node-card";
 import { CheckpointCard } from "./components/checkpoint-card";
 import Modal from "@/components/ui/modal";
-import { ChatConfig, ChatItem } from "@/app/chats/components/types";
+import { ChatConfig, ChatItem } from "@/app/(console)/chats/components/types";
 
 const modelosMock = [
   { value: "gpt-4o", label: "GPT-4o (2024)" },

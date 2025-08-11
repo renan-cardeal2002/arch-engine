@@ -1,4 +1,4 @@
-import { ConfigField } from "@/app/chats/components/types";
+import { ConfigField } from "@/app/(console)/chats/components/types";
 import { create } from "zustand";
 
 export interface ChatItem {
