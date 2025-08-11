@@ -6,7 +6,7 @@ export interface AgentState extends WithMessages {
   weather_forecast: WeatherForecast[];
   context?: {
     agent_state: { flow_data?: string | null; service_id?: number | string | null };
-    settings: Record<string, any>;
+    settings: Record<string, unknown>;
   };
 }
 

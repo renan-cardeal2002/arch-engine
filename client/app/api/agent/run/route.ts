@@ -9,6 +9,7 @@ const AGENT_URL = process.env.NEXT_PUBLIC_AGENT_URL;
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
+  const token = request.cookies.get('token')?.value;
 
   try {
     const response = await fetch(`${AGENT_URL}/agent`, {
@@ -16,6 +17,7 @@ export async function POST(request: NextRequest) {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'text/event-stream',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: JSON.stringify(body),
     });

@@ -1,11 +1,15 @@
 'use server';
 
+import { cookies } from 'next/headers'
 import { Checkpoint } from './types';
 
 const AGENT_URL = process.env.NEXT_PUBLIC_AGENT_URL;
 
 export async function getHistory<TAgentState, TInterruptValue>(threadId: string): Promise<Checkpoint<TAgentState, TInterruptValue>[]> {
-  const response = await fetch(`${AGENT_URL}/history?thread_id=${threadId}`);
+  const token = cookies().get('token')?.value
+  const response = await fetch(`${AGENT_URL}/history?thread_id=${threadId}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+  });
 
   if (!response.ok) {
     const error = await response.json();
@@ -17,10 +21,12 @@ export async function getHistory<TAgentState, TInterruptValue>(threadId: string)
 }
 
 export async function stopAgent(threadId: string): Promise<void> {
+  const token = cookies().get('token')?.value
   const response = await fetch(`${AGENT_URL}/agent/stop`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: JSON.stringify({ thread_id: threadId }),
   });
