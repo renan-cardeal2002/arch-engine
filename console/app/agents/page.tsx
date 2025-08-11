@@ -54,7 +54,7 @@ export default function AgentsPage() {
   };
 
   useEffect(() => {
-    setItems([{ label: "Home", href: "/" }, { label: "Ferramentas" }]);
+    setItems([{ label: "Home", href: "/" }, { label: "Agentes" }]);
     fetchAgents();
   }, [setItems]);
 

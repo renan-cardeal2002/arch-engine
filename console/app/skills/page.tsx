@@ -24,11 +24,11 @@ export default function SkillsPage() {
       if (Array.isArray(data)) {
         setDados(data);
       } else {
-        console.warn("Resposta inesperada da API /api/agent:", data);
+        console.warn("Resposta inesperada da API /api/skill:", data);
         setDados([]);
       }
     } catch (error) {
-      console.error("Erro ao buscar agentes:", error);
+      console.error("Erro ao buscar habilidades:", error);
       setDados([]);
     }
   };
