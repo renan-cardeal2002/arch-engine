@@ -9,11 +9,11 @@ import { AlignLeft, Barcode, Box, Plus, Save } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const tasksMock = [ // # mock
+const tasksMock = [
+  // # mock
   {
-    id: 1,
+    id: "28d45222-8672-47e7-a90d-4aa880c48a61",
     name: "Gerador de orçamentos",
-    code: "66f10b24-b59b-4dff-8336-b3f16200698d6",
     description:
       "Automação que executa a manipulação de orçamentos e cria orçamentos personalizados.",
   },
@@ -23,10 +23,9 @@ export default function TaskPage() {
   const { setItems } = useBreadcrumb();
 
   const { id } = useParams<{ id: string }>();
-  const router = useRouter();
   const [instructions, setInstructions] = useState("");
 
-  const task = tasksMock.find((t) => t.id === Number(id)); // # mock
+  const task = tasksMock.find((t) => t.id === id); // # mock
 
   if (!task) {
     return <div className="p-8 text-red-600">Task não encontrada</div>;
@@ -43,9 +42,7 @@ export default function TaskPage() {
   return (
     <PageLayout
       actions={
-        <Button
-          className="bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800"
-        >
+        <Button className="bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800">
           <Plus />
           Nova carga de trabalho
         </Button>
@@ -80,7 +77,7 @@ export default function TaskPage() {
                   Código de identificação
                 </div>
                 <div className="text-lg font-mono opacity-80 text-neutral-800 dark:text-neutral-300">
-                  {task.code}
+                  {task.id}
                 </div>
               </div>
             </div>

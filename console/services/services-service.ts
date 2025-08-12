@@ -4,11 +4,15 @@ export async function getServices() {
   return await res.json();
 }
 
-export async function addService(name: string, description: string) {
+export async function addService(
+  name: string,
+  description: string,
+  service_type: string
+) {
   const res = await fetch(`/api/service`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, description }),
+    body: JSON.stringify({ name, description, service_type }),
   });
   if (!res.ok) throw new Error("Erro ao adicionar serviço");
   return await res.json();

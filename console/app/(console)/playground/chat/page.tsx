@@ -24,9 +24,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { NodeCard } from "./components/node-card";
 import { CheckpointCard } from "./components/checkpoint-card";
 import Modal from "@/components/ui/modal";
-import { ChatConfig, ChatItem } from "@/app/(console)/chats/components/types";
 
-const modelosMock = [ // # mock
+const modelosMock = [
+  // # mock
   { value: "gpt-4o", label: "GPT-4o (2024)" },
   { value: "gpt-4-0125-preview", label: "GPT-4 Turbo (0125)" },
   { value: "gpt-4-1106-preview", label: "GPT-4 Turbo (1106)" },
@@ -58,7 +58,7 @@ export default function ChatPlaygroundPage() {
     chatItem?.systemPrompt || ""
   );
 
-  const threadId = "987e7fd5-cd27-4493-8f0c-6cfb47326808";
+  const threadId = "987e7fd5-cd27-4493-8f0c-6cfb47326808"; // mock
   const [inputValue, setInputValue] = useState("");
   const [serviceId, setServiceId] = useState("");
   const [flowData, setFlowData] = useState("");
@@ -69,15 +69,6 @@ export default function ChatPlaygroundPage() {
   const [showNodesinfo, setShowNodesinfo] = useState(false);
   const [restoreError, setRestoreError] = useState(false);
   const [showModalConfig, setShowModalConfig] = useState(false);
-  const [configModalOpen, setConfigModalOpen] = useState(true);
-  const [configModalItem, setConfigModalItem] = useState<ChatItem | null>(null);
-
-  function handleConfigSave(config: ChatConfig) {
-    if (configModalItem) {
-      setConfigModalOpen(false);
-      setConfigModalItem(null);
-    }
-  }
 
   useEffect(() => {
     setSystemPrompt(chatItem?.systemPrompt || "");
@@ -239,11 +230,15 @@ export default function ChatPlaygroundPage() {
                 value={model}
                 onChange={(e) => setModel(e.target.value)}
               >
-                {modelosMock.map((m) => ( // # mock
-                  <option key={m.value} value={m.value}>
-                    {m.label}
-                  </option>
-                ))}
+                {modelosMock.map(
+                  (
+                    m // # mock
+                  ) => (
+                    <option key={m.value} value={m.value}>
+                      {m.label}
+                    </option>
+                  )
+                )}
               </select>
             </div>
 

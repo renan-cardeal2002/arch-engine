@@ -11,7 +11,8 @@ import StepsBoard from "./components/task-step-board";
 import { Input } from "@/components/ui/input";
 import Modal from "@/components/ui/modal";
 
-const modelosMock = [ // # mock
+const modelosMock = [
+  // # mock
   { value: "gpt-4o", label: "GPT-4o (2024)" },
   { value: "gpt-4-0125-preview", label: "GPT-4 Turbo (0125)" },
   { value: "gpt-4-1106-preview", label: "GPT-4 Turbo (1106)" },
@@ -29,7 +30,8 @@ const modelosMock = [ // # mock
   { value: "gpt-3", label: "gpt-3" },
 ];
 
-const etapasMock: Step[] = [ // # mock
+const etapasMock: Step[] = [
+  // # mock
   {
     id: 1,
     name: "Consultar caixa de e-mail",
@@ -62,7 +64,7 @@ export default function TaskPlaygroundPage() {
     chatItem?.systemPrompt || ""
   );
 
-  const threadId = "987e7fd5-cd27-4493-8f0c-6cfb47326808";
+  const threadId = "987e7fd5-cd27-4493-8f0c-6cfb47326808"; // mock
   const [flowData, setFlowData] = useState("");
   const [toolName, setToolName] = useState("");
   const [settingsJson, setSettingsJson] = useState("");
@@ -92,11 +94,15 @@ export default function TaskPlaygroundPage() {
                 value={model}
                 onChange={(e) => setModel(e.target.value)}
               >
-                {modelosMock.map((m) => ( // # mock
-                  <option key={m.value} value={m.value}>
-                    {m.label}
-                  </option>
-                ))}
+                {modelosMock.map(
+                  (
+                    m // # mock
+                  ) => (
+                    <option key={m.value} value={m.value}>
+                      {m.label}
+                    </option>
+                  )
+                )}
               </select>
             </div>
 

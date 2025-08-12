@@ -3,26 +3,24 @@
 import { useBreadcrumb } from "@/components/breadcrumb-provider";
 import PageLayout from "@/components/page-layout";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Eye, Cog, Plus } from "lucide-react";
+import { Edit, Trash2, Eye, Cog, Plus, Save } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import ConfigModal from "./components/config-modal";
 import { TaskConfig, TaskItem } from "./components/types";
-import { getServices } from "@/services/services-service";
+import { addService, getServices } from "@/services/services-service";
+import Modal from "@/components/ui/modal";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function TasksPage() {
   const { setItems } = useBreadcrumb();
   const [configModalOpen, setConfigModalOpen] = useState(false);
   const [configModalItem, setConfigModalItem] = useState<TaskItem | null>(null);
-
-  const [dados, setDados] = useState<TaskItem[]>([
-    {
-      id: 1,
-      name: "Gerador de orçamentos",
-      description:
-        "Automação que executa a manipulação de orçamentos e cria orçamentos personalizados",
-    },
-  ]);
+  const [dados, setDados] = useState<TaskItem[]>([]);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
   const fetchServices = async () => {
     try {
@@ -31,6 +29,21 @@ export default function TasksPage() {
     } catch (error) {
       console.error("Erro ao buscar serviços:", error);
       setDados([]);
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const data = await addService(name, description, "TASK");
+
+      if (!data.ok) throw new Error("Erro ao cadastrar agente");
+
+      setName("");
+      setDescription("");
+      setShowModal(false);
+      fetchServices();
+    } catch (error) {
+      console.error("Erro ao cadastrar agente:", error);
     }
   };
 
@@ -59,12 +72,54 @@ export default function TasksPage() {
   return (
     <PageLayout
       actions={
-        <Button className="bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800">
+        <Button
+          className="bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800"
+          onClick={() => setShowModal(true)}
+        >
           <Plus />
           Nova tarefa
         </Button>
       }
     >
+      <Modal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        footer={
+          <>
+            <Button
+              onClick={() => setShowModal(false)}
+              className="bg-neutral-800 text-white mr-2"
+            >
+              Cancelar
+            </Button>
+            <Button
+              className="bg-green-600 text-white"
+              onClick={handleSubmit}
+              disabled={!name.trim() || !description.trim()}
+            >
+              <Save />
+              Salvar
+            </Button>
+          </>
+        }
+      >
+        <h2 className="text-xl font-bold mb-4">Nova Tarefa</h2>
+        <Input
+          type="text"
+          className="border rounded px-3 py-2 w-full mb-3"
+          placeholder="Nome"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <Textarea
+          className="border rounded px-3 py-2 w-full mb-3"
+          placeholder="Descrição"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={10}
+        />
+      </Modal>
+
       <ConfigModal
         open={configModalOpen}
         onClose={() => setConfigModalOpen(false)}
