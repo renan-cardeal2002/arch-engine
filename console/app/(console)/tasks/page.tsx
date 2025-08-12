@@ -8,15 +8,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import ConfigModal from "./components/config-modal";
 import { TaskConfig, TaskItem } from "./components/types";
+import { getServices } from "@/services/services-service";
 
 export default function TasksPage() {
   const { setItems } = useBreadcrumb();
   const [configModalOpen, setConfigModalOpen] = useState(false);
   const [configModalItem, setConfigModalItem] = useState<TaskItem | null>(null);
-
-  useEffect(() => {
-    setItems([{ label: "Home", href: "/" }, { label: "Tarefas" }]);
-  }, [setItems]);
 
   const [dados, setDados] = useState<TaskItem[]>([
     {
@@ -26,6 +23,21 @@ export default function TasksPage() {
         "Automação que executa a manipulação de orçamentos e cria orçamentos personalizados",
     },
   ]);
+
+  const fetchServices = async () => {
+    try {
+      const data = await getServices();
+      setDados(data);
+    } catch (error) {
+      console.error("Erro ao buscar serviços:", error);
+      setDados([]);
+    }
+  };
+
+  useEffect(() => {
+    setItems([{ label: "Home", href: "/" }, { label: "Serviços" }]);
+    fetchServices();
+  }, [setItems]);
 
   function handleConfig(item: TaskItem) {
     setConfigModalItem(item);
@@ -47,9 +59,7 @@ export default function TasksPage() {
   return (
     <PageLayout
       actions={
-        <Button
-          className="bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800"
-        >
+        <Button className="bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800">
           <Plus />
           Nova tarefa
         </Button>

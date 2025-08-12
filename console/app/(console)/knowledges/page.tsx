@@ -11,14 +11,7 @@ import { useEffect, useState } from "react";
 
 export default function KnowledgesPage() {
   const { setItems } = useBreadcrumb();
-
   const [dados, setDados] = useState<any[]>([]);
-  // {
-  //     id: 1,
-  //     name: "Regras de geração de Orçamento",
-  //     description: "Para gerar o orçamento, siga as regras abaixo a seguir...",
-  //     endpoint_id: 1,
-  //   },
   const [showModal, setShowModal] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");

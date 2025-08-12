@@ -9,12 +9,11 @@ export async function _get_token() {
   return (await cookieStore).get(TOKEN_COOKIE_NAME)?.value;
 }
 
-export async function POST(_request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    const body = await _request.json();
+    const body = await request.json();
     const token = await _get_token();
-
-    const response = await fetch(`${API_URL}/agent/skill`, {
+    const response = await fetch(`${API_URL}/tool/${body.id}/parameters`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -26,12 +25,12 @@ export async function POST(_request: NextRequest) {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data?.detail || "Erro ao vincular habilidade ao agente");
+      throw new Error(data?.detail || "Erro ao criar a ferramenta");
     }
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error("Erro na rota /agent/[id]/skill:", error);
+    console.error("Erro na rota /tool:", error);
     return NextResponse.json(
       { error: (error as Error).message || "Erro desconhecido" },
       { status: 500 }
@@ -45,27 +44,34 @@ export async function GET(
 ) {
   try {
     const token = await _get_token();
-    const response = await fetch(`${API_URL}/agent/${params.id}/skill`, {
+    const response = await fetch(`${API_URL}/tool/${params.id}/parameters`, {
+      method: "GET",
       headers: {
-        Authorization: `Bearer ${token}`,
         Accept: "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
 
-    const rawText = await response.text();
+    let data;
 
     try {
-      const data = JSON.parse(rawText);
-      return NextResponse.json(data);
+      data = await response.json();
     } catch (jsonError) {
-      console.error("Erro ao parsear JSON:", jsonError);
-      return NextResponse.json(
-        { error: "Resposta da API não é JSON válido", conteudo: rawText },
-        { status: 500 }
+      const text = await response.text();
+      console.error("Resposta não é JSON. Conteúdo bruto:", text);
+      throw new Error(`Erro ao buscar ferramentas: ${text}`);
+    }
+
+    if (!response.ok) {
+      console.error("Erro da API:", data);
+      throw new Error(
+        data?.detail || `Erro ${response.status} ao buscar ferramentas`
       );
     }
+
+    return NextResponse.json(data);
   } catch (error) {
-    console.error("Erro na rota /agent/[id]/skill:", error);
+    console.error("Erro na rota /tool:", error);
     return NextResponse.json(
       { error: (error as Error).message || "Erro desconhecido" },
       { status: 500 }

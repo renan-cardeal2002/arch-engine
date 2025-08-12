@@ -2,16 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-const TEMP_TOKEN = process.env.TEMP_TOKEN || "";
+const TOKEN_COOKIE_NAME = process.env.TOKEN_COOKIE_NAME || "token";
 
-async function _force_login() {
+export async function _get_token() {
   const cookieStore = cookies();
-  (await cookieStore).set("token", TEMP_TOKEN, {
-    httpOnly: false,
-    secure: true,
-    path: "/",
-    maxAge: 60 * 60 * 24,
-  });
+  return (await cookieStore).get(TOKEN_COOKIE_NAME)?.value;
 }
 
 export async function GET(
@@ -19,11 +14,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    await _force_login();
-    const cookieStore = cookies();
-    const token = (await cookieStore).get("token")?.value;
-    console.log(params.id);
-
+    const token = await _get_token();
     const response = await fetch(`${API_URL}/agent/${params.id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -32,10 +23,9 @@ export async function GET(
     });
 
     const rawText = await response.text();
-    console.log("Resposta bruta:", rawText);
 
     try {
-      const data = JSON.parse(rawText); // força o JSON pra ver o erro real
+      const data = JSON.parse(rawText);
       return NextResponse.json(data);
     } catch (jsonError) {
       console.error("Erro ao parsear JSON:", jsonError);
