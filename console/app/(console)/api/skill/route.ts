@@ -2,29 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-const TEMP_TOKEN = process.env.TEMP_TOKEN || "";
+const TOKEN_COOKIE_NAME = process.env.TOKEN_COOKIE_NAME || "token";
 
-export async function _force_login() {
+export async function _get_token() {
   const cookieStore = cookies();
-
-  (await cookieStore).set("token", TEMP_TOKEN, {
-    httpOnly: false,
-    secure: true,
-    path: "/",
-    maxAge: 60 * 60 * 24,
-  });
-
-  return NextResponse.json({ success: true });
+  return (await cookieStore).get(TOKEN_COOKIE_NAME)?.value;
 }
 
 export async function POST(request: NextRequest) {
   try {
-    await _force_login();
     const body = await request.json();
-
-    // Busca o token JWT do cookie
-    const cookieStore = cookies();
-    const token = (await cookieStore).get("token")?.value;
+    const token = await _get_token();
 
     const response = await fetch(`${API_URL}/skill`, {
       method: "POST",
@@ -53,10 +41,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(_request: NextRequest) {
   try {
-    await _force_login();
-    const cookieStore = cookies();
-    const token = (await cookieStore).get("token")?.value;
-
+    const token = await _get_token();
     const response = await fetch(`${API_URL}/skill`, {
       method: "GET",
       headers: {
