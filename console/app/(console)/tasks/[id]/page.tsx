@@ -1,43 +1,96 @@
 "use client";
 
+import SkillSelector from "@/components/app-skill-selector";
+import SkillTable from "@/components/app-skill-table";
 import { useBreadcrumb } from "@/components/breadcrumb-provider";
 import PageLayout from "@/components/page-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { getService } from "@/services/services-service";
 import { AlignLeft, Barcode, Box, Plus, Save } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-
-const tasksMock = [
-  // # mock
-  {
-    id: "28d45222-8672-47e7-a90d-4aa880c48a61",
-    name: "Gerador de orçamentos",
-    description:
-      "Automação que executa a manipulação de orçamentos e cria orçamentos personalizados.",
-  },
-];
 
 export default function TaskPage() {
   const { setItems } = useBreadcrumb();
-
   const { id } = useParams<{ id: string }>();
+
   const [instructions, setInstructions] = useState("");
+  const [task, setTask] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [serviceAgents, setServiceAgents] = useState<any>([]);
+  const [serviceSteps, setServiceSteps] = useState<any>([]);
+  const [availableAgents, setAgents] = useState<any[]>([]);
+  const [agentSelected, setAgentSelected] = useState<any>({});
 
-  const task = tasksMock.find((t) => t.id === id); // # mock
+  const fetchAgents = async () => {
+    try {
+      const res = await fetch("/api/agent");
+      const data = await res.json();
 
-  if (!task) {
-    return <div className="p-8 text-red-600">Task não encontrada</div>;
-  }
+      if (Array.isArray(data)) {
+        setAgents(data);
+      } else {
+        console.warn("Resposta inesperada da API /api/agent:", data);
+        setAgents([]);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar agentes:", error);
+      setAgents([]);
+    }
+  };
+
+  const handleSubmitAgent = async () => {
+    try {
+      // await addServiceAgent(id, agentSelected.id);
+      setAgentSelected({});
+      await getService(id);
+    } catch (error) {
+      console.error("Erro ao vincular habilidade ao agente:", error);
+    }
+  };
 
   useEffect(() => {
+    let active = true;
+
+    (async () => {
+      try {
+        setLoading(true);
+        const data = await getService(id);
+        await fetchAgents();
+        if (active) setTask(data);
+      } catch (error) {
+        console.error("Erro ao buscar serviço:", error);
+        if (active) setTask(null);
+      } finally {
+        if (active) setLoading(false);
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [id]);
+
+  useEffect(() => {
+    if (!task?.name) return;
     setItems([
       { label: "Home", href: "/" },
-      { label: "Tarefas", href: "/tasks" },
-      { label: `${task.name}` },
+      { label: "Serviços", href: "/tasks" },
+      { label: task.name },
     ]);
-  }, [setItems, task]);
+  }, [task?.name, setItems]);
+
+  if (loading) {
+    return <div className="p-8 text-center">Carregando…</div>;
+  }
+
+  if (!task) {
+    return (
+      <div className="p-8 text-center text-red-600">Task não encontrada</div>
+    );
+  }
 
   return (
     <PageLayout
@@ -152,32 +205,38 @@ export default function TaskPage() {
             <Plus /> Novo agente
           </Button>
         </div>
-        <Input
-          placeholder="Buscar um agente..."
-          className="
-                mb-4
-                bg-white dark:bg-neutral-900
-                border border-neutral-200 dark:border-neutral-700
-                text-neutral-900 dark:text-neutral-100
-                placeholder:text-neutral-400 dark:placeholder:text-neutral-500
-            "
+        <SkillSelector
+          skills={availableAgents}
+          selected={agentSelected}
+          setSelected={setAgentSelected}
+          onSubmit={handleSubmitAgent}
+          label="Selecione um agente"
         />
-        <table className="min-w-full">
-          <thead>
-            <tr className="text-neutral-600 dark:text-neutral-300">
-              <th className="py-2 px-4 text-left">Nome</th>
-              <th className="py-2 px-4 text-left">Descrição</th>
-              <th className="py-2 px-4 text-left">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td colSpan={3} className="text-center opacity-80">
-                Nenhum agente vinculado a essa tarefa
-              </td>
-            </tr>
-          </tbody>
-        </table>
+
+        <SkillTable skills={serviceAgents} />
+      </div>
+
+      <div
+        className="
+            bg-white dark:bg-neutral-900
+            border border-neutral-200 dark:border-neutral-800
+            shadow rounded-lg p-6 m-8
+        "
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div className="font-semibold text-lg flex items-center gap-2 text-neutral-900 dark:text-neutral-100">
+            <span>▾</span> Etapas
+          </div>
+          <Button
+            className="
+                    bg-green-100 text-green-700 hover:bg-green-200
+                    dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800
+                "
+          >
+            <Plus /> Nova estapa
+          </Button>
+        </div>
+        <SkillTable skills={serviceSteps} />
       </div>
     </PageLayout>
   );

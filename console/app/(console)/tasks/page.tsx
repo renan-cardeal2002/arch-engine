@@ -34,7 +34,7 @@ export default function TasksPage() {
 
   const handleSubmit = async () => {
     try {
-      const data = await addService(name, description, "TASK");
+      const data = await addService(name, description, "ACTIVE", "TASK");
 
       if (!data.ok) throw new Error("Erro ao cadastrar agente");
 
@@ -132,6 +132,8 @@ export default function TasksPage() {
           <tr>
             <th className="px-4 py-2 text-left">Nome</th>
             <th className="px-4 py-2 text-left">Descrição</th>
+            <th className="px-4 py-2 text-left">Tipo Serviço</th>
+            <th className="px-4 py-2 text-left">Status</th>
             <th className="px-4 py-2 text-left">Ações</th>
           </tr>
         </thead>
@@ -140,6 +142,8 @@ export default function TasksPage() {
             <tr key={item.id} className="border-t">
               <td className="px-4 py-2">{item.name}</td>
               <td className="px-4 py-2">{item.description}</td>
+              <td className="px-4 py-2">{item.service_type}</td>
+              <td className="px-4 py-2">{item.status}</td>
               <td className="px-4 py-2 flex gap-2">
                 <Link href={`/tasks/${item.id}`}>
                   <Button className="hover:bg-blue-600" title="Visualizar">

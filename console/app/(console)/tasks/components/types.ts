@@ -12,5 +12,7 @@ export type TaskItem = {
   id: number;
   name: string;
   description: string;
+  service_type: string;
+  status: string;
   config?: TaskConfig;
 };

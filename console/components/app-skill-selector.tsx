@@ -6,11 +6,13 @@ export default function SkillSelector({
   selected,
   setSelected,
   onSubmit,
+  label = "Selecione uma habilidade",
 }: {
   skills: any[];
   selected: any;
   setSelected: (s: any) => void;
   onSubmit: () => void;
+  label?: string;
 }) {
   return (
     <div className="flex gap-2 mb-4 items-center">
@@ -22,7 +24,7 @@ export default function SkillSelector({
         }}
         className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-100 px-3 py-2 rounded"
       >
-        <option value="">Selecione uma habilidade</option>
+        <option value="">{label}</option>
         {skills.map((skill: any) => (
           <option key={skill.id} value={skill.id}>
             {skill.name}

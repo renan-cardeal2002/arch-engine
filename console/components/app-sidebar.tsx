@@ -12,7 +12,6 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarGroupLabel,
-  SidebarGroupAction,
 } from "@/components/ui/sidebar";
 import {
   Bot,
@@ -66,18 +65,10 @@ export function AppSidebar() {
           <SidebarMenu>
             <SidebarGroupLabel>Serviços</SidebarGroupLabel>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname === "/chats"}>
-                <Link href="/chats">
-                  <MessageCircleCode />
-                  Chats
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
               <SidebarMenuButton asChild isActive={pathname === "/tasks"}>
                 <Link href="/tasks">
-                  <ListChecks />
-                  Tarefas
+                  <MessageCircleCode />
+                  Serviços
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
